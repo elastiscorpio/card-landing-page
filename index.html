@@ -162,34 +162,6 @@
                 </div>
             </div>
             
-            <!-- Stats -->
-            <div class="flex justify-between px-4 pb-4">
-                <div class="flex justify-between w-full px-4">
-                    <div class="stat-icon group">
-                        <div class="text-red-400 flex flex-col items-center">
-                            <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
-                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-                                <path d="M2 2l7.586 7.586"></path>
-                                <circle cx="11" cy="11" r="2"></circle>
-                            </svg>
-                            <span class="text-lg mt-1 font-gothic">ATTACK</span>
-                            <span class="text-3xl font-bold">95</span>
-                        </div>
-                    </div>
-                    <div class="stat-icon group">
-                        <div class="text-yellow-400 flex flex-col items-center">
-                            <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                <path d="M12 8v4"></path>
-                                <path d="M12 16h.01"></path>
-                            </svg>
-                            <span class="text-lg mt-1 font-gothic">DEFENSE</span>
-                            <span class="text-3xl font-bold">80</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <!-- Tap Counter Game -->
             <div id="tap-game-container" class="absolute inset-0 flex items-center justify-center hidden pointer-events-none">
@@ -421,18 +393,8 @@
             timeoutId = setTimeout(() => {
                 // End the game
                 isCounting = false;
-                // Alternate between updating attack and defense numbers with proper colors
-                if (Math.random() > 0.5) {
-                    const attackElement = document.querySelector('.stat-icon:nth-child(1) .text-3xl');
-                    attackElement.textContent = tapCounter;
-                    attackElement.classList.remove('text-yellow-400');
-                    attackElement.classList.add('text-red-400');
-                } else {
-                    const defenseElement = document.querySelector('.stat-icon:nth-child(2) .text-3xl');
-                    defenseElement.textContent = tapCounter;
-                    defenseElement.classList.remove('text-red-400');
-                    defenseElement.classList.add('text-yellow-400');
-                }
+                // Just show the final tap count
+                console.log(`Final tap count: ${tapCounter}`);
                 
                 // Create fireworks
                 const colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#9900ff'];
