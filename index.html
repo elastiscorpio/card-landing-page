@@ -32,6 +32,7 @@
             border-image: url('http://static.photos/black/1200x630/42') 30 round;
             box-shadow: 0 0 70px rgba(0, 255, 255, 0.7), 
                         inset 0 0 40px rgba(0, 200, 255, 0.6);
+            border-radius: 20px;
             transform-style: preserve-3d;
             transition: transform 0.1s;
             position: relative;
@@ -121,7 +122,7 @@
             <div class="glow-effect"></div>
             
             <!-- Character Zone -->
-            <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 85%;">
+            <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 85%; border-radius: 15px;">
                 <div class="absolute inset-0 bg-black opacity-70"></div>
                 <video autoplay loop muted class="w-full h-full object-cover">
                     <source src="http://static.photos/black/1200x630/42" type="video/mp4">
@@ -135,16 +136,16 @@
             
             <!-- Name Banner -->
             <div class="name-banner text-center pb-6 px-4 z-10">
-                <h1 class="text-4xl md:text-5xl text-white mb-1">LORD MALRAK</h1>
-                <h2 class="text-xl md:text-2xl text-gray-300 italic">of the Eternal Host</h2>
+                <h1 class="text-3xl md:text-4xl text-white mb-1">LORD MALRAK</h1>
+                <h2 class="text-lg md:text-xl text-gray-300 italic">of the Eternal Host</h2>
                 <div class="flex justify-center mt-2">
                     <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
                 </div>
             </div>
 
             <!-- Story Button -->
-            <div class="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-20">
-                <button id="story-button" class="bg-black/90 hover:bg-gray-900 text-cyan-400 font-bold py-3 px-8 rounded-full border-2 border-cyan-400 shadow-lg transition-all duration-300 hover:scale-105 transform hover:rotate-1">
+            <div class="absolute bottom-36 left-1/2 transform -translate-x-1/2 z-20">
+                <button id="story-button" class="bg-black/90 hover:bg-gray-900 text-cyan-400 font-bold py-2 px-6 border border-cyan-400 shadow-lg transition-all duration-300 hover:scale-105 transform hover:rotate-1 font-gothic" style="font-family: 'UnifrakturMaguntia', cursive; border-radius: 5px; letter-spacing: 1px;">
                     Read the Story
                 </button>
             </div>
