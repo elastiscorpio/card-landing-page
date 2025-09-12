@@ -61,7 +61,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('http://static.photos/black/1200x630/42') center/cover;
             mix-blend-mode: overlay;
             opacity: 0.3;
             pointer-events: none;
@@ -141,8 +140,9 @@
             <!-- Character Zone -->
             <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 85%; border-radius: 15px;">
                 <div class="absolute inset-0 bg-black opacity-70"></div>
-                <video autoplay loop muted class="w-full h-full object-cover">
-                    <source src="http://static.photos/black/1200x630/42" type="video/mp4">
+               <video autoplay muted loop playsinline class="w-full h-full object-cover">
+    <source src="background.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
                 </video>
                 <div class="character-overlay"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
