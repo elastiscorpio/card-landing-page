@@ -115,21 +115,12 @@
 <body class="h-screen w-screen flex items-center justify-center p-4">
     <div id="cursor-trails"></div>
     
-    <div class="card-container w-full h-full max-w-2xl max-h-[90vh]">
+    <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
         <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
             <div class="glow-effect"></div>
             
-            <!-- Name Banner -->
-            <div class="name-banner text-center pt-6 px-4 z-10">
-                <h1 class="text-4xl md:text-5xl text-red-400 mb-1">LORD MALRAK</h1>
-                <h2 class="text-xl md:text-2xl text-red-300 italic">of the Eternal Host</h2>
-                <div class="flex justify-center mt-2">
-                    <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
-                </div>
-            </div>
-            
             <!-- Character Zone -->
-            <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 80%;">
+            <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 85%;">
                 <div class="absolute inset-0 bg-black opacity-70"></div>
                 <video autoplay loop muted class="w-full h-full object-cover">
                     <source src="http://static.photos/black/1200x630/42" type="video/mp4">
@@ -141,8 +132,17 @@
             </div>
             
             
+            <!-- Name Banner -->
+            <div class="name-banner text-center pb-6 px-4 z-10">
+                <h1 class="text-4xl md:text-5xl text-red-400 mb-1">LORD MALRAK</h1>
+                <h2 class="text-xl md:text-2xl text-red-300 italic">of the Eternal Host</h2>
+                <div class="flex justify-center mt-2">
+                    <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
+                </div>
+            </div>
+
             <!-- Story Button -->
-            <div class="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-20">
                 <button id="story-button" class="bg-red-900/80 hover:bg-red-800/90 text-red-200 font-bold py-2 px-6 rounded-full border-2 border-red-700 shadow-lg transition-all duration-300 hover:scale-105">
                     Read the Story
                 </button>
