@@ -231,21 +231,48 @@
         let initialDistance = null;
         const card = document.getElementById('card');
         
-        // Handle device motion (phones/tablets)
-        if (window.DeviceMotionEvent) {
-            window.addEventListener('devicemotion', (e) => {
-                const x = e.accelerationIncludingGravity.x;
-                const y = e.accelerationIncludingGravity.y;
+        // Touch/swipe handling for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                const touchX = e.touches[0].clientX;
+                const touchY = e.touches[0].clientY;
                 
-                // Map device tilt to card rotation
-                const xAxis = x ? x * 5 : 0;
-                const yAxis = y ? y * 5 : 0;
+                currentX = (touchX - touchStartX) / 10;
+                currentY = (touchY - touchStartY) / 10;
                 
-                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+                card.style.transform = `rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            // Smooth return to center
+            gsap.to(card, {
+                rotateY: 0,
+                rotateX: 0,
+                duration: 0.5,
+                ease: "elastic.out(1, 0.3)"
             });
-        }
+            currentX = 0;
+            currentY = 0;
+        });
         
-        // Mouse movement for desktop
+        // Mouse movement for desktop (keep existing cursor trails)
         document.addEventListener('mousemove', (e) => {
             const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
             const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
