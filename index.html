@@ -182,6 +182,14 @@
             </div>
             
             
+            <!-- Scoreboard -->
+            <div id="scoreboard" class="absolute top-4 left-4 bg-black/70 rounded-lg p-2 hidden">
+                <div class="text-cyan-300 font-bold mb-1">-- რეკორდი</div>
+                <div id="scores-container" class="flex flex-col gap-1">
+                    <!-- Scores will be added here -->
+                </div>
+            </div>
+
             <!-- Tap Counter Game -->
             <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none">
                 <div class="relative">
@@ -189,7 +197,7 @@
                         <div class="w-48 h-48 rounded-full bg-cyan-900/80 border-6 border-cyan-700 blur-sm"></div>
                     </div>
                     <div class="relative bg-cyan-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-cyan-700 shadow-lg">
-                        <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200">0</div>
+                        <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200 transition-all duration-300">0</div>
                     </div>
                 </div>
             </div>
@@ -207,8 +215,23 @@
         AOS.init();
         feather.replace();
         
-        // Reset scale on double tap
+        // Initialize scoreboard with empty state
+        const scoresContainer = document.getElementById('scores-container');
+        const emptyScore = document.createElement('div');
+        emptyScore.className = 'score text-gray-500 text-sm';
+        emptyScore.textContent = '---';
+        scoresContainer.appendChild(emptyScore);
+        
+        // Reset scale and scores on double tap
         document.addEventListener('dblclick', () => {
+            // Reset scores
+            const scores = document.querySelectorAll('.score');
+            scores.forEach(score => {
+                score.textContent = '---';
+                score.classList.add('text-gray-500');
+                score.classList.remove('text-white');
+            });
+            
             scale = 1;
             card.style.transform = card.style.transform.replace(/scale\([^)]*\)/, 'scale(1)');
         });
@@ -412,8 +435,9 @@
             timeoutId = setTimeout(() => {
                 // End the game
                 isCounting = false;
-                // Just show the final tap count
-                console.log(`Final tap count: ${tapCounter}`);
+                // Show final tap count
+                tapCount.textContent = tapCounter;
+                tapCount.classList.add('text-6xl'); // Make it bigger for final display
                 
                 // Create fireworks
                 const colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#9900ff'];
@@ -445,7 +469,27 @@
                 
                 // Hide the game container after delay
                 setTimeout(() => {
+                    tapCount.classList.remove('text-6xl'); // Reset size
                     tapGameContainer.classList.add('hidden');
+                    
+                    // Update scoreboard
+                    const scoresContainer = document.getElementById('scores-container');
+                    const scoreElements = scoresContainer.querySelectorAll('.score');
+                    
+                    // Always add new score at the top
+                    const newScore = document.createElement('div');
+                    newScore.className = 'score text-white text-sm';
+                    newScore.textContent = tapCounter;
+                    
+                    // Replace existing score
+                    if (scoreElements.length > 0) {
+                        scoreElements[0].remove();
+                    }
+                    scoresContainer.appendChild(newScore);
+                    
+                    // Show scoreboard if hidden
+                    document.getElementById('scoreboard').classList.remove('hidden');
+                    
                 }, 1500);
             }, 1000);
         });
