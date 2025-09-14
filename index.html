@@ -29,11 +29,9 @@
 
     .card-container{perspective:1000px;transform-style:preserve-3d;}
     .card{
-      background:linear-gradient(135deg,#111 0%,#000 100%);
-      border:12px solid transparent;
-      border-image:url('http://static.photos/black/1200x630/42') 30 round;
+      background:transparent;
       box-shadow:0 0 70px rgba(0,255,255,.7), inset 0 0 40px rgba(0,200,255,.6);
-      border-radius:20px;transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
+      transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
     }
 
     .character-zone{position:relative;overflow:hidden;}
@@ -92,7 +90,7 @@
       <div class="glow-effect"></div>
 
       <!-- Character Zone -->
-      <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height:85%;border-radius:15px;">
+      <div class="character-zone flex-1 relative overflow-hidden" style="height:100%;">
 
         <!-- background tint (subtle) -->
         <div class="absolute inset-0 bg-black/60"></div>
