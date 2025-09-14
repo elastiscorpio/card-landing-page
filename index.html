@@ -69,7 +69,9 @@
     /* Clip the video so it only shows inside the hollow window of the frame.
        Tweak values (top right bottom left) to your liking. */
     .character-video.clip-window{
-      clip-path: inset(10.5% 6.5% 33% 6.5% round 18px);
+      clip-path: inset(25% 15% 45% 15% round 18px);
+      transform: scale(1.4);
+      transform-origin: center;
     }
     .card-frame{
       position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;pointer-events:none;
@@ -106,6 +108,7 @@
             src="./OG%20Base%20card%20special%20silver.png"
             alt="OG Base Card - Silver Frame"
             class="card-frame"
+            style="transform: scale(1.4); transform-origin: center;"
           />
         </div>
 
