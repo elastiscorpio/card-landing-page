@@ -55,6 +55,25 @@
       position:absolute;width:20px;height:20px;border-radius:50%;
       background:rgba(0,255,255,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
     }
+    
+    /* Celebration particles */
+    .celebration-particle {
+      position: absolute;
+      z-index: 9999;
+      filter: drop-shadow(0 0 10px currentColor);
+      animation: particle-fall 2s ease-out forwards;
+    }
+    
+    @keyframes particle-fall {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100px) scale(0.2);
+        opacity: 0;
+      }
+    }
     @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
@@ -287,13 +306,50 @@
           },i*50);
         }
 
-        const a2=new Audio('https://www.soundjay.com/misc/sounds/magic-chime-02.mp3'); a2.volume=.5; a2.play();
+        // Celebration effects
+        const a2 = new Audio('https://www.soundjay.com/misc/sounds/sci-fi-sound-effect-01.mp3'); 
+        a2.volume = 0.7;
+        a2.play();
+
+        // Create celebration particles
+        for(let i=0;i<100;i++){
+          setTimeout(()=>{
+            const particle = document.createElement('div');
+            particle.className = 'absolute rounded-full w-3 h-3 z-50';
+            const colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00'];
+            const color = colors[Math.floor(Math.random()*colors.length)];
+            particle.style.background = color;
+            particle.style.left = `${Math.random()*100}%`;
+            particle.style.top = `${Math.random()*100}%`;
+            particle.style.boxShadow = `0 0 15px 5px ${color}`;
+            document.getElementById('card').appendChild(particle);
+            
+            gsap.to(particle, {
+              x: (Math.random()-.5)*300,
+              y: (Math.random()-.5)*300,
+              scale: Math.random()*5 + 2,
+              opacity: 0,
+              duration: 2,
+              ease: "power2.out",
+              onComplete: () => particle.remove()
+            });
+          }, i*20);
+        }
+
+        // Glow pulse effect
+        gsap.to('.glow-effect', {
+          opacity: 0.9,
+          duration: 0.3,
+          yoyo: true,
+          repeat: 3,
+          ease: "sine.inOut"
+        });
 
         setTimeout(()=>{
           tapCount.classList.remove('text-6xl');
           tapGameContainer.classList.add('hidden');
 
-          const scoreEls=scoresContainer.querySelectorAll('.score');
+          const scoreEls = scoresContainer.querySelectorAll('.score');
           const newScore=document.createElement('div');
           newScore.className='score text-white text-sm'; newScore.textContent=tapCounter;
           if(scoreEls.length>0){scoreEls[0].remove();}
