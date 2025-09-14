@@ -1,498 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Card - Lord of the Eternal Host</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
-        
-        body {
-            font-family: 'MedievalSharp', cursive;
-            --font-gothic: 'UnifrakturMaguntia', cursive;
-            overflow: hidden;
-            background: #000;
-            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z' /></svg>"), auto;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Living Card - Lord of the Eternal Host</title>
 
-        /* Fullscreen background video (added) */
-        #bg-video {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-        }
-        
-        .card-container {
-            perspective: 1000px;
-            transform-style: preserve-3d;
-        }
-        
-        .card {
-            background: linear-gradient(135deg, #111 0%, #000 100%);
-            border: 12px solid transparent;
-            border-image: url('http://static.photos/black/1200x630/42') 30 round;
-            box-shadow: 0 0 70px rgba(0, 255, 255, 0.7), 
-                        inset 0 0 40px rgba(0, 200, 255, 0.6);
-            border-radius: 20px;
-            transform-style: preserve-3d;
-            transition: transform 0.1s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .character-zone {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .character-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            mix-blend-mode: overlay;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        .glow-effect {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, rgba(0, 255, 255, 0.5) 0%, transparent 70%);
-            animation: pulse 2s infinite alternate;
-            pointer-events: none;
-            filter: blur(10px);
-        }
-        
-        .name-banner {
-            font-family: 'Cinzel Decorative', cursive;
-            text-shadow: 0 0 15px rgba(0, 255, 255, 0.9);
-            letter-spacing: 2px;
-        }
-        
-        .lore-panel {
-            background: url('http://static.photos/red/1200x630/42') center/cover;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
-        }
-        
-        .stat-icon {
-            transition: all 0.3s ease;
-        }
-        
-        .stat-icon:hover {
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 12px #00ffff);
-        }
-        
-        .cursor-trail {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: rgba(0, 255, 255, 0.7);
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: screen;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.7; }
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
+
+    body{
+      font-family:'MedievalSharp',cursive;
+      --font-gothic:'UnifrakturMaguntia',cursive;
+      overflow:hidden;
+      background:#000;
+      cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
+    }
+
+    /* Fullscreen background video */
+    #bg-video{
+      position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;
+    }
+
+    .card-container{perspective:1000px;transform-style:preserve-3d;}
+    .card{
+      background:linear-gradient(135deg,#111 0%,#000 100%);
+      border:12px solid transparent;
+      border-image:url('http://static.photos/black/1200x630/42') 30 round;
+      box-shadow:0 0 70px rgba(0,255,255,.7), inset 0 0 40px rgba(0,200,255,.6);
+      border-radius:20px;transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
+    }
+
+    .character-zone{position:relative;overflow:hidden;}
+
+    .character-overlay{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      mix-blend-mode:overlay;opacity:.3;pointer-events:none;
+    }
+
+    .glow-effect{
+      position:absolute;width:100%;height:100%;
+      background:radial-gradient(circle at center, rgba(0,255,255,.5) 0%, transparent 70%);
+      animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
+    }
+
+    .name-banner{font-family:'Cinzel Decorative',cursive;text-shadow:0 0 15px rgba(0,255,255,.9);letter-spacing:2px;}
+    .lore-panel{background:url('http://static.photos/red/1200x630/42') center/cover;box-shadow:inset 0 0 20px rgba(0,0,0,.7);}
+    .stat-icon{transition:all .3s ease;}
+    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #00ffff);}
+    .cursor-trail{
+      position:absolute;width:20px;height:20px;border-radius:50%;
+      background:rgba(0,255,255,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
+    }
+    @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
+    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+    .floating{animation:float 6s ease-in-out infinite;}
+
+    /* === NEW: Frame + video stack === */
+    .frame-stack{position:relative;width:100%;height:100%;}
+    .character-video{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;
+    }
+    /* Clip the video so it only shows inside the hollow window of the frame.
+       Tweak values (top right bottom left) to your liking. */
+    .character-video.clip-window{
+      clip-path: inset(10.5% 6.5% 33% 6.5% round 18px);
+    }
+    .card-frame{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;pointer-events:none;
+    }
+  </style>
 </head>
 <body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
 
-    <!-- Fullscreen Background Video (added) -->
-    <video autoplay muted loop playsinline preload id="bg-video">
-        <source src="background.mp4" type="video/mp4">
-    </video>
-
-    <div id="cursor-trails"></div>
-    
-    <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
-        <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
-            <div class="glow-effect"></div>
-            
-            <!-- Character Zone -->
-            <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height: 85%; border-radius: 15px;">
-                <div class="absolute inset-0 bg-black opacity-70"></div>
-               <video autoplay muted loop playsinline class="w-full h-full object-cover">
+  <!-- Fullscreen Background Video -->
+  <video autoplay muted loop playsinline preload id="bg-video">
     <source src="background.mp4" type="video/mp4">
-    Your browser does not support HTML5 video.
-                </video>
-                <div class="character-overlay"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-3/4 h-3/4 bg-gradient-to-b from-transparent via-yellow-900/10 to-transparent rounded-full filter blur-xl opacity-30"></div>
-                </div>
-            </div>
-            
-            
-            <!-- Name Banner -->
-            <div class="name-banner text-center pb-6 px-4 z-10">
-                <h1 class="text-3xl md:text-4xl text-white mb-1">LORD MALRAK</h1>
-                <h2 class="text-lg md:text-xl text-gray-300 italic">of the Eternal Host</h2>
-                <div class="flex justify-center mt-2">
-                    <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
-                </div>
-            </div>
+  </video>
 
-            <!-- Story Button -->
-            <div class="absolute bottom-36 left-1/2 transform -translate-x-1/2 z-20">
-                <button id="story-button" class="bg-black/90 hover:bg-gray-900 text-cyan-400 font-bold py-2 px-6 border border-cyan-400 shadow-lg transition-all duration-300 hover:scale-105 transform hover:rotate-1 font-gothic" style="font-family: 'UnifrakturMaguntia', cursive; border-radius: 5px; letter-spacing: 1px;">
-                    Read the Story
-                </button>
-            </div>
+  <div id="cursor-trails"></div>
 
-            <!-- Story Modal -->
-            <div id="story-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-                <div class="bg-black/95 border-4 border-cyan-400 rounded-lg max-w-md max-h-[80vh] overflow-y-auto p-6 relative">
-                    <h3 class="text-cyan-400 font-bold mb-4 text-xl border-b border-cyan-400 pb-2">LORE OF THE ETERNAL HOST</h3>
-                    <p class="mb-3 text-gray-300">Once a mortal king who sought eternal life, Lord Malrak made a pact with the ancient ones.</p>
-                    <p class="mb-3 text-gray-300">Now he commands legions of the undying, bound to his will through dark rituals.</p>
-                    <p class="mb-3 text-gray-300">His golden crown hides the hollow skull beneath, yet his power grows with each soul consumed.</p>
-                    <p class="mb-3 text-gray-300">Whispers speak of a hidden weakness, a secret known only to the oldest of ghosts.</p>
-                    <div id="secret-text" class="hidden mt-4 text-cyan-400 italic">
-                        <p>Only moonlight can reveal his true form...</p>
-                    </div>
-                </div>
-            </div>
-            
-            
-            <!-- Scoreboard -->
-            <div id="scoreboard" class="absolute top-4 left-4 bg-black/70 rounded-lg p-2 hidden">
-                <div class="text-cyan-300 font-bold mb-1">-- რეკორდი</div>
-                <div id="scores-container" class="flex flex-col gap-1">
-                    <!-- Scores will be added here -->
-                </div>
-            </div>
+  <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
+    <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
+      <div class="glow-effect"></div>
 
-            <!-- Tap Counter Game -->
-            <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-48 h-48 rounded-full bg-cyan-900/80 border-6 border-cyan-700 blur-sm"></div>
-                    </div>
-                    <div class="relative bg-cyan-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-cyan-700 shadow-lg">
-                        <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200 transition-all duration-300">0</div>
-                    </div>
-                </div>
-            </div>
+      <!-- Character Zone -->
+      <div class="character-zone flex-1 relative my-2 mx-4 rounded-lg overflow-hidden" style="height:85%;border-radius:15px;">
 
+        <!-- background tint (subtle) -->
+        <div class="absolute inset-0 bg-black/60"></div>
+
+        <!-- STACK: character video (clipped) + silver frame -->
+        <div class="frame-stack">
+          <video autoplay muted loop playsinline class="character-video clip-window">
+            <source src="background.mp4" type="video/mp4">
+          </video>
+
+          <!-- Your silver frame PNG with transparent center -->
+          <img
+            src="./OG%20Base%20card%20special%20silver.png"
+            alt="OG Base Card - Silver Frame"
+            class="card-frame"
+          />
         </div>
+
+        <div class="character-overlay"></div>
+
+        <!-- Soft center glow -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-3/4 h-3/4 bg-gradient-to-b from-transparent via-yellow-900/10 to-transparent rounded-full filter blur-xl opacity-30"></div>
+        </div>
+      </div>
+
+      <!-- Name Banner -->
+      <div class="name-banner text-center pb-6 px-4 z-10">
+        <h1 class="text-3xl md:text-4xl text-white mb-1">LORD MALRAK</h1>
+        <h2 class="text-lg md:text-xl text-gray-300 italic">of the Eternal Host</h2>
+        <div class="flex justify-center mt-2">
+          <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
+        </div>
+      </div>
+
+      <!-- Story Button -->
+      <div class="absolute bottom-36 left-1/2 transform -translate-x-1/2 z-20">
+        <button id="story-button" class="bg-black/90 hover:bg-gray-900 text-cyan-400 font-bold py-2 px-6 border border-cyan-400 shadow-lg transition-all duration-300 hover:scale-105 transform hover:rotate-1 font-gothic" style="font-family:'UnifrakturMaguntia',cursive;border-radius:5px;letter-spacing:1px;">
+          Read the Story
+        </button>
+      </div>
+
+      <!-- Story Modal -->
+      <div id="story-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+        <div class="bg-black/95 border-4 border-cyan-400 rounded-lg max-w-md max-h-[80vh] overflow-y-auto p-6 relative">
+          <h3 class="text-cyan-400 font-bold mb-4 text-xl border-b border-cyan-400 pb-2">LORE OF THE ETERNAL HOST</h3>
+          <p class="mb-3 text-gray-300">Once a mortal king who sought eternal life, Lord Malrak made a pact with the ancient ones.</p>
+          <p class="mb-3 text-gray-300">Now he commands legions of the undying, bound to his will through dark rituals.</p>
+          <p class="mb-3 text-gray-300">His golden crown hides the hollow skull beneath, yet his power grows with each soul consumed.</p>
+          <p class="mb-3 text-gray-300">Whispers speak of a hidden weakness, a secret known only to the oldest of ghosts.</p>
+          <div id="secret-text" class="hidden mt-4 text-cyan-400 italic">
+            <p>Only moonlight can reveal his true form...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoreboard -->
+      <div id="scoreboard" class="absolute top-4 left-4 bg-black/70 rounded-lg p-2 hidden">
+        <div class="text-cyan-300 font-bold mb-1">-- რეკორდი</div>
+        <div id="scores-container" class="flex flex-col gap-1"></div>
+      </div>
+
+      <!-- Tap Counter Game -->
+      <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-48 h-48 rounded-full bg-cyan-900/80 border-6 border-cyan-700 blur-sm"></div>
+          </div>
+          <div class="relative bg-cyan-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-cyan-700 shadow-lg">
+            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200 transition-all duration-300">0</div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    
-    <!-- Audio Element -->
-    <audio id="ambient-sound" loop>
-        <source src="https://www.soundjay.com/misc/sounds/wind-chime-01.mp3" type="audio/mpeg">
-    </audio>
-    
-    <script>
-        // Initialize libraries
-        AOS.init();
-        feather.replace();
-        
-        // Initialize scoreboard with empty state
-        const scoresContainer = document.getElementById('scores-container');
-        const emptyScore = document.createElement('div');
-        emptyScore.className = 'score text-gray-500 text-sm';
-        emptyScore.textContent = '---';
-        scoresContainer.appendChild(emptyScore);
-        
-        // Reset scale and scores on double tap
-        document.addEventListener('dblclick', () => {
-            // Reset scores
-            const scores = document.querySelectorAll('.score');
-            scores.forEach(score => {
-                score.textContent = '---';
-                score.classList.add('text-gray-500');
-                score.classList.remove('text-white');
-            });
-            
-            scale = 1;
-            card.style.transform = card.style.transform.replace(/scale\([^)]*\)/, 'scale(1)');
-        });
-        
-        // Device motion and touch handling
-        let scale = 1;
-        let initialDistance = null;
-        const card = document.getElementById('card');
-        
-        // Touch/swipe handling for mobile
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let currentX = 0;
-        let currentY = 0;
-        let isDragging = false;
+  </div>
 
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            }
-        });
+  <!-- Audio Element -->
+  <audio id="ambient-sound" loop>
+    <source src="https://www.soundjay.com/misc/sounds/wind-chime-01.mp3" type="audio/mpeg">
+  </audio>
 
-        document.addEventListener('touchmove', (e) => {
-            if (isDragging && e.touches.length === 1) {
-                e.preventDefault();
-                const touchX = e.touches[0].clientX;
-                const touchY = e.touches[0].clientY;
-                
-                currentX = (touchX - touchStartX) / 10;
-                currentY = (touchY - touchStartY) / 10;
-                
-                card.style.transform = `rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
-            }
-        });
+  <script>
+    // Initialize libraries
+    AOS.init();
+    feather.replace();
 
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-            // Smooth return to center
-            gsap.to(card, {
-                rotateY: 0,
-                rotateX: 0,
-                duration: 0.5,
-                ease: "elastic.out(1, 0.3)"
-            });
-            currentX = 0;
-            currentY = 0;
-        });
-        
-        // Mouse movement for desktop (keep existing cursor trails)
-        document.addEventListener('mousemove', (e) => {
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
-            
-            // Create cursor trails
-            const trail = document.createElement('div');
-            trail.className = 'cursor-trail';
-            trail.style.left = `${e.pageX}px`;
-            trail.style.top = `${e.pageY}px`;
-            document.getElementById('cursor-trails').appendChild(trail);
-            
-            // Remove trails after animation
-            setTimeout(() => {
-                trail.style.opacity = '0';
-                trail.style.transform = 'translate(-50%, -50%) scale(2)';
-                setTimeout(() => trail.remove(), 300);
-            }, 500);
-        });
-        
-        // Pinch-to-zoom functionality
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                initialDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-            }
-        });
-        
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-                const currentDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-                
-                if (initialDistance) {
-                    const newScale = Math.min(Math.max(scale * (currentDistance / initialDistance), 0.5), 3);
-                    scale = newScale;
-                    card.style.transform = card.style.transform.replace(/scale\([^)]*\)/, `scale(${scale})`);
-                }
-                initialDistance = currentDistance;
-            }
-        });
-        
-        document.addEventListener('touchend', () => {
-            initialDistance = null;
-        });
-        
-        // Character hover effect
-        const characterZone = document.querySelector('.character-zone');
-        characterZone.addEventListener('mouseenter', () => {
-            gsap.to('.character-overlay', { opacity: 0.5, duration: 0.5 });
-            gsap.to('.glow-effect', { opacity: 0.8, duration: 0.5 });
-        });
-        characterZone.addEventListener('mouseleave', () => {
-            gsap.to('.character-overlay', { opacity: 0.3, duration: 0.5 });
-            gsap.to('.glow-effect', { opacity: 0.3, duration: 0.5 });
-        });
-        
-        // Secret trigger
-        let clickCount = 0;
-        document.getElementById('secret-trigger').addEventListener('click', () => {
-            clickCount++;
-            if (clickCount >= 3) {
-                document.getElementById('secret-text').classList.remove('hidden');
-                gsap.from('#secret-text', { opacity: 0, y: 20, duration: 1 });
-                clickCount = 0;
-                
-                // Play sound
-                const audio = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3');
-                audio.play();
-            }
-        });
-        
-        // Ambient sound control
-        const ambientSound = document.getElementById('ambient-sound');
-        ambientSound.volume = 0.3;
-        
-        // Start sound after user interaction
-        document.addEventListener('click', () => {
-            ambientSound.play();
-        }, { once: true });
-        
-        // Handle touch events for mobile
-        document.addEventListener('touchstart', () => {
-            ambientSound.play();
-        }, { once: true });
-        
-        // Animate text appearance
-        const fadeInText = document.querySelectorAll('.fade-in-text');
-        fadeInText.forEach((el, i) => {
-            gsap.from(el, {
-                opacity: 0,
-                y: 10,
-                duration: 0.8,
-                delay: i * 0.3,
-                ease: "power2.out"
-            });
-        });
+    // Scoreboard empty state
+    const scoresContainer = document.getElementById('scores-container');
+    const emptyScore = document.createElement('div');
+    emptyScore.className = 'score text-gray-500 text-sm';
+    emptyScore.textContent = '---';
+    scoresContainer.appendChild(emptyScore);
 
-        // Tap Counter Game
-        const tapGameContainer = document.getElementById('tap-game-container');
-        const tapCount = document.getElementById('tap-count');
-        const finalScore = document.getElementById('final-score');
-        const instruction = document.getElementById('counter-instruction');
-        
-        let tapCounter = 0;
-        let timeoutId = null;
-        let isCounting = false;
-        
-        document.addEventListener('click', () => {
-            if (!isCounting) {
-                // Start the game
-                isCounting = true;
-                tapCounter = 1;
-                tapGameContainer.classList.remove('hidden');
-                tapCount.textContent = tapCounter;
-                tapCount.classList.remove('hidden');
-                instruction.classList.add('hidden');
-                finalScore.classList.add('hidden');
-                
-                // Glow effect
-                gsap.to('.glow-effect', { opacity: 0.8, duration: 0.2 });
-                setTimeout(() => gsap.to('.glow-effect', { opacity: 0.3, duration: 0.5 }), 200);
-                
-                // Play sound
-                const audio = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3');
-                audio.volume = 0.2;
-                audio.play();
-            } else {
-                // Increment counter
-                tapCounter++;
-                tapCount.textContent = tapCounter;
-                
-                // Random card tilt effect
-                if (tapCounter % 5 === 0) {
-                    gsap.to('#card', {
-                        rotateZ: Math.random() * 10 - 5,
-                        duration: 0.2,
-                        yoyo: true,
-                        repeat: 1
-                    });
-                }
-            }
-            
-            // Reset timeout
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                // End the game
-                isCounting = false;
-                // Show final tap count
-                tapCount.textContent = tapCounter;
-                tapCount.classList.add('text-6xl'); // Make it bigger for final display
-                
-                // Create fireworks
-                const colors = ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#0099ff', '#9900ff'];
-                for (let i = 0; i < 30; i++) {
-                    setTimeout(() => {
-                        const firework = document.createElement('div');
-                        firework.className = 'absolute rounded-full w-2 h-2';
-                        firework.style.background = colors[Math.floor(Math.random() * colors.length)];
-                        firework.style.left = `${Math.random() * 100}%`;
-                        firework.style.top = `${Math.random() * 100}%`;
-                        firework.style.boxShadow = `0 0 10px 2px ${colors[Math.floor(Math.random() * colors.length)]}`;
-                        document.getElementById('card').appendChild(firework);
-                        
-                        gsap.to(firework, {
-                            x: (Math.random() - 0.5) * 200,
-                            y: (Math.random() - 0.5) * 200,
-                            scale: 5,
-                            opacity: 0,
-                            duration: 1,
-                            onComplete: () => firework.remove()
-                        });
-                    }, i * 50);
-                }
-                
-                // Play sound
-                const audio = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-02.mp3');
-                audio.volume = 0.5;
-                audio.play();
-                
-                // Hide the game container after delay
-                setTimeout(() => {
-                    tapCount.classList.remove('text-6xl'); // Reset size
-                    tapGameContainer.classList.add('hidden');
-                    
-                    // Update scoreboard
-                    const scoresContainer = document.getElementById('scores-container');
-                    const scoreElements = scoresContainer.querySelectorAll('.score');
-                    
-                    // Always add new score at the top
-                    const newScore = document.createElement('div');
-                    newScore.className = 'score text-white text-sm';
-                    newScore.textContent = tapCounter;
-                    
-                    // Replace existing score
-                    if (scoreElements.length > 0) {
-                        scoreElements[0].remove();
-                    }
-                    scoresContainer.appendChild(newScore);
-                    
-                    // Show scoreboard if hidden
-                    document.getElementById('scoreboard').classList.remove('hidden');
-                    
-                }, 1500);
-            }, 1000);
-        });
-    </script>
+    // Reset scale and scores on double tap
+    document.addEventListener('dblclick', () => {
+      document.querySelectorAll('.score').forEach(s=>{
+        s.textContent='---'; s.classList.add('text-gray-500'); s.classList.remove('text-white');
+      });
+      scale = 1;
+      card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,'scale(1)');
+    });
+
+    // Device motion & touch handling
+    let scale = 1;
+    let initialDistance = null;
+    const card = document.getElementById('card');
+
+    // Touch rotate
+    let touchStartX=0,touchStartY=0,currentX=0,currentY=0,isDragging=false;
+    document.addEventListener('touchstart',e=>{
+      if(e.touches.length===1){isDragging=true;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;}
+    });
+    document.addEventListener('touchmove',e=>{
+      if(isDragging&&e.touches.length===1){
+        e.preventDefault();
+        const tx=e.touches[0].clientX, ty=e.touches[0].clientY;
+        currentX=(tx-touchStartX)/10; currentY=(ty-touchStartY)/10;
+        card.style.transform=`rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
+      }
+    },{passive:false});
+    document.addEventListener('touchend',()=>{
+      isDragging=false;
+      gsap.to(card,{rotateY:0,rotateX:0,duration:.5,ease:"elastic.out(1,0.3)"});
+      currentX=0; currentY=0;
+    });
+
+    // Mouse parallax + trail
+    document.addEventListener('mousemove',e=>{
+      const xAxis=(window.innerWidth/2 - e.pageX)/25;
+      const yAxis=(window.innerHeight/2 - e.pageY)/25;
+      card.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+
+      const trail=document.createElement('div');
+      trail.className='cursor-trail';
+      trail.style.left=`${e.pageX}px`; trail.style.top=`${e.pageY}px`;
+      document.getElementById('cursor-trails').appendChild(trail);
+      setTimeout(()=>{trail.style.opacity='0';trail.style.transform='translate(-50%,-50%) scale(2)';setTimeout(()=>trail.remove(),300);},500);
+    });
+
+    // Pinch zoom
+    document.addEventListener('touchstart',e=>{
+      if(e.touches.length===2){
+        initialDistance=Math.hypot(
+          e.touches[0].clientX-e.touches[1].clientX,
+          e.touches[0].clientY-e.touches[1].clientY
+        );
+      }
+    });
+    document.addEventListener('touchmove',e=>{
+      if(e.touches.length===2){
+        const d=Math.hypot(
+          e.touches[0].clientX-e.touches[1].clientX,
+          e.touches[0].clientY-e.touches[1].clientY
+        );
+        if(initialDistance){
+          const newScale = Math.min(Math.max(scale * (d/initialDistance), .5), 3);
+          scale=newScale;
+          card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,`scale(${scale})`);
+        }
+        initialDistance=d;
+      }
+    });
+    document.addEventListener('touchend',()=>{initialDistance=null;});
+
+    // Hover effect
+    const characterZone=document.querySelector('.character-zone');
+    characterZone.addEventListener('mouseenter',()=>{
+      gsap.to('.character-overlay',{opacity:.5,duration:.5});
+      gsap.to('.glow-effect',{opacity:.8,duration:.5});
+    });
+    characterZone.addEventListener('mouseleave',()=>{
+      gsap.to('.character-overlay',{opacity:.3,duration:.5});
+      gsap.to('.glow-effect',{opacity:.3,duration:.5});
+    });
+
+    // Secret trigger
+    let clickCount=0;
+    document.getElementById('secret-trigger').addEventListener('click',()=>{
+      clickCount++;
+      if(clickCount>=3){
+        document.getElementById('secret-text').classList.remove('hidden');
+        gsap.from('#secret-text',{opacity:0,y:20,duration:1});
+        clickCount=0;
+        new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3').play();
+      }
+    });
+
+    // Ambient sound
+    const ambientSound=document.getElementById('ambient-sound');
+    ambientSound.volume=.3;
+    const startAudio=()=>ambientSound.play();
+    document.addEventListener('click',startAudio,{once:true});
+    document.addEventListener('touchstart',startAudio,{once:true});
+
+    // Tap Counter Game
+    const tapGameContainer=document.getElementById('tap-game-container');
+    const tapCount=document.getElementById('tap-count');
+    const finalScore=document.getElementById('final-score');
+    const instruction=document.getElementById('counter-instruction');
+    let tapCounter=0, timeoutId=null, isCounting=false;
+
+    document.addEventListener('click',()=>{
+      if(!isCounting){
+        isCounting=true; tapCounter=1;
+        tapGameContainer.classList.remove('hidden');
+        tapCount.textContent=tapCounter; tapCount.classList.remove('hidden');
+        instruction?.classList.add('hidden'); finalScore?.classList.add('hidden');
+        gsap.to('.glow-effect',{opacity:.8,duration:.2});
+        setTimeout(()=>gsap.to('.glow-effect',{opacity:.3,duration:.5}),200);
+        const a=new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3'); a.volume=.2; a.play();
+      }else{
+        tapCounter++; tapCount.textContent=tapCounter;
+        if(tapCounter % 5 === 0){
+          gsap.to('#card',{rotateZ:Math.random()*10-5,duration:.2,yoyo:true,repeat:1});
+        }
+      }
+
+      clearTimeout(timeoutId);
+      timeoutId=setTimeout(()=>{
+        isCounting=false;
+        tapCount.textContent=tapCounter;
+        tapCount.classList.add('text-6xl');
+
+        const colors=['#ff0000','#ff9900','#ffff00','#00ff00','#0099ff','#9900ff'];
+        for(let i=0;i<30;i++){
+          setTimeout(()=>{
+            const fw=document.createElement('div');
+            fw.className='absolute rounded-full w-2 h-2';
+            const c=colors[Math.floor(Math.random()*colors.length)];
+            fw.style.background=c; fw.style.left=`${Math.random()*100}%`; fw.style.top=`${Math.random()*100}%`;
+            fw.style.boxShadow=`0 0 10px 2px ${c}`;
+            document.getElementById('card').appendChild(fw);
+            gsap.to(fw,{x:(Math.random()-.5)*200,y:(Math.random()-.5)*200,scale:5,opacity:0,duration:1,onComplete:()=>fw.remove()});
+          },i*50);
+        }
+
+        const a2=new Audio('https://www.soundjay.com/misc/sounds/magic-chime-02.mp3'); a2.volume=.5; a2.play();
+
+        setTimeout(()=>{
+          tapCount.classList.remove('text-6xl');
+          tapGameContainer.classList.add('hidden');
+
+          const scoreEls=scoresContainer.querySelectorAll('.score');
+          const newScore=document.createElement('div');
+          newScore.className='score text-white text-sm'; newScore.textContent=tapCounter;
+          if(scoreEls.length>0){scoreEls[0].remove();}
+          scoresContainer.appendChild(newScore);
+          document.getElementById('scoreboard').classList.remove('hidden');
+        },1500);
+      },1000);
+    });
+  </script>
 </body>
 </html>
