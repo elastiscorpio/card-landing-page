@@ -117,36 +117,6 @@
         </div>
       </div>
 
-      <!-- Name Banner -->
-      <div class="name-banner text-center pb-6 px-4 z-10">
-        <h1 class="text-3xl md:text-4xl text-white mb-1">LORD MALRAK</h1>
-        <h2 class="text-lg md:text-xl text-gray-300 italic">of the Eternal Host</h2>
-        <div class="flex justify-center mt-2">
-          <i data-feather="crown" class="text-yellow-400 animate-pulse" id="secret-trigger"></i>
-        </div>
-      </div>
-
-      <!-- Story Button -->
-      <div class="absolute bottom-36 left-1/2 transform -translate-x-1/2 z-20">
-        <button id="story-button" class="bg-black/90 hover:bg-gray-900 text-cyan-400 font-bold py-2 px-6 border border-cyan-400 shadow-lg transition-all duration-300 hover:scale-105 transform hover:rotate-1 font-gothic" style="font-family:'UnifrakturMaguntia',cursive;border-radius:5px;letter-spacing:1px;">
-          Read the Story
-        </button>
-      </div>
-
-      <!-- Story Modal -->
-      <div id="story-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-        <div class="bg-black/95 border-4 border-cyan-400 rounded-lg max-w-md max-h-[80vh] overflow-y-auto p-6 relative">
-          <h3 class="text-cyan-400 font-bold mb-4 text-xl border-b border-cyan-400 pb-2">LORE OF THE ETERNAL HOST</h3>
-          <p class="mb-3 text-gray-300">Once a mortal king who sought eternal life, Lord Malrak made a pact with the ancient ones.</p>
-          <p class="mb-3 text-gray-300">Now he commands legions of the undying, bound to his will through dark rituals.</p>
-          <p class="mb-3 text-gray-300">His golden crown hides the hollow skull beneath, yet his power grows with each soul consumed.</p>
-          <p class="mb-3 text-gray-300">Whispers speak of a hidden weakness, a secret known only to the oldest of ghosts.</p>
-          <div id="secret-text" class="hidden mt-4 text-cyan-400 italic">
-            <p>Only moonlight can reveal his true form...</p>
-          </div>
-        </div>
-      </div>
-
       <!-- Scoreboard -->
       <div id="scoreboard" class="absolute top-4 left-4 bg-black/70 rounded-lg p-2 hidden">
         <div class="text-cyan-300 font-bold mb-1">-- რეკორდი</div>
@@ -265,18 +235,6 @@
     characterZone.addEventListener('mouseleave',()=>{
       gsap.to('.character-overlay',{opacity:.3,duration:.5});
       gsap.to('.glow-effect',{opacity:.3,duration:.5});
-    });
-
-    // Secret trigger
-    let clickCount=0;
-    document.getElementById('secret-trigger').addEventListener('click',()=>{
-      clickCount++;
-      if(clickCount>=3){
-        document.getElementById('secret-text').classList.remove('hidden');
-        gsap.from('#secret-text',{opacity:0,y:20,duration:1});
-        clickCount=0;
-        new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3').play();
-      }
     });
 
     // Ambient sound
