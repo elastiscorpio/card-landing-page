@@ -25,10 +25,10 @@
     /* Background video positioned behind card frame's empty space */
     #bg-video{
       position:absolute;
-      width:806px;
-      height:482px;
-      left:109px;
-      top:94px;
+      width:564px;  /* 806 * 0.7 */
+      height:337px; /* 482 * 0.7 */
+      left:166px;   /* 109 + (806-564)/2 */
+      top:150px;    /* 94 + (482-337)/2 */
       object-fit:cover;
       z-index:4;
       clip-path: inset(25% 15% 45% 15% round 18px);
@@ -107,7 +107,7 @@
 <body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
 
   <!-- Background Video (positioned behind card frame's empty space) -->
-  <div class="frame-stack" style="position:absolute; width:806px; height:482px; left:109px; top:94px; z-index:4;">
+  <div class="frame-stack" style="position:absolute; width:564px; height:337px; left:166px; top:150px; z-index:4;">
     <video autoplay muted loop playsinline preload id="bg-video">
       <source src="background.mp4" type="video/mp4">
     </video>
