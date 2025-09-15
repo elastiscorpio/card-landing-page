@@ -22,15 +22,18 @@
       cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
     }
 
-    /* Background video positioned behind card */
+    /* Background video positioned behind card frame's empty space */
     #bg-video{
-      position:fixed;
+      position:absolute;
       width:806px;
       height:482px;
       left:109px;
       top:94px;
       object-fit:cover;
       z-index:4;
+      clip-path: inset(25% 15% 45% 15% round 18px);
+      transform: scale(1.4);
+      transform-origin: center;
     }
 
     .card-container{perspective:1000px;transform-style:preserve-3d;}
@@ -103,10 +106,12 @@
 </head>
 <body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
 
-  <!-- Background Video (positioned behind card) -->
-  <video autoplay muted loop playsinline preload id="bg-video">
-    <source src="background.mp4" type="video/mp4">
-  </video>
+  <!-- Background Video (positioned behind card frame's empty space) -->
+  <div class="frame-stack" style="position:absolute; width:806px; height:482px; left:109px; top:94px; z-index:4;">
+    <video autoplay muted loop playsinline preload id="bg-video">
+      <source src="background.mp4" type="video/mp4">
+    </video>
+  </div>
 
   <div id="cursor-trails"></div>
 
