@@ -22,20 +22,6 @@
       cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
     }
 
-    /* Background video positioned behind card frame's empty space */
-    #bg-video{
-      position:absolute;
-      width:564px;  /* 806 * 0.7 */
-      height:337px; /* 482 * 0.7 */
-      left:166px;   /* 109 + (806-564)/2 */
-      top:150px;    /* 94 + (482-337)/2 */
-      object-fit:cover;
-      z-index:4;
-      clip-path: inset(25% 15% 45% 15% round 18px);
-      transform: scale(1.4);
-      transform-origin: center;
-    }
-
     .card-container{perspective:1000px;transform-style:preserve-3d;}
     .card{
       background:transparent;
@@ -74,44 +60,41 @@
     }
     
     @keyframes particle-fall {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100px) scale(0.2);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(100px) scale(0.2); opacity: 0; }
     }
     @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === NEW: Frame + video stack === */
-    .frame-stack{position:relative;width:100%;height:100%;}
-    .character-video{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;
+    /* === Frame + video stack (final) === */
+    .frame-stack { position:relative; width:100%; height:100%; }
+
+    /* This box matches the frame’s top “window” area. Adjust inset values if needed. */
+    .character-window{
+      position:absolute;
+      inset:25% 15% 45% 15%; /* top right bottom left */
+      border-radius:18px;
+      overflow:hidden;       /* clean rounded crop */
+      z-index:4;             /* under the frame (5), above tints */
+      transform: scale(1.4); /* keep if your frame artwork expects scaling */
+      transform-origin:center;
     }
-    /* Clip the video so it only shows inside the hollow window of the frame.
-       Tweak values (top right bottom left) to your liking. */
-    .character-video.clip-window{
-      clip-path: inset(25% 15% 45% 15% round 18px);
-      transform: scale(1.4);
-      transform-origin: center;
+    .character-window video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
+
     .card-frame{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;pointer-events:none;
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:contain; z-index:5; pointer-events:none;
     }
   </style>
 </head>
 <body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
-
-  <!-- Background Video (positioned behind card frame's empty space) -->
-  <div class="frame-stack" style="position:absolute; width:564px; height:337px; left:166px; top:150px; z-index:4;">
-    <video autoplay muted loop playsinline preload id="bg-video">
-      <source src="background.mp4" type="video/mp4">
-    </video>
-  </div>
 
   <div id="cursor-trails"></div>
 
@@ -125,13 +108,15 @@
         <!-- background tint (subtle) -->
         <div class="absolute inset-0 bg-black/60"></div>
 
-        <!-- STACK: character video (clipped) + silver frame -->
+        <!-- STACK: fitted character video inside frame window + silver frame -->
         <div class="frame-stack">
-          <video autoplay muted loop playsinline class="character-video clip-window" style="z-index:4;">
-            <source src="background.mp4" type="video/mp4">
-          </video>
+          <div class="character-window">
+            <video autoplay muted loop playsinline preload="auto">
+              <source src="background.mp4" type="video/mp4">
+            </video>
+          </div>
 
-          <!-- Your silver frame PNG with transparent center -->
+          <!-- Silver frame PNG with transparent center -->
           <img
             src="./OG%20Base%20card%20special%20silver.png"
             alt="OG Base Card - Silver Frame"
