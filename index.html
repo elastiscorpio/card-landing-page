@@ -34,7 +34,7 @@
     .card-container{perspective:1000px;transform-style:preserve-3d;}
     .card{
       background:transparent;
-      box-shadow:0 0 70px rgba(0,255,255,.7), inset 0 0 40px rgba(0,200,255,.6);
+      box-shadow:0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
       transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
     }
 
@@ -47,17 +47,17 @@
 
     .glow-effect{
       position:absolute;width:100%;height:100%;
-      background:radial-gradient(circle at center, rgba(0,255,255,.5) 0%, transparent 70%);
+      background:radial-gradient(circle at center, rgba(255,215,0,.6) 0%, transparent 70%);
       animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
     }
 
     .name-banner{font-family:'Cinzel Decorative',cursive;text-shadow:0 0 15px rgba(0,255,255,.9);letter-spacing:2px;}
     .lore-panel{background:url('http://static.photos/red/1200x630/42') center/cover;box-shadow:inset 0 0 20px rgba(0,0,0,.7);}
     .stat-icon{transition:all .3s ease;}
-    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #00ffff);}
+    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #ffd700);}
     .cursor-trail{
       position:absolute;width:20px;height:20px;border-radius:50%;
-      background:rgba(0,255,255,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
+      background:rgba(255,215,0,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
     }
     
     /* Celebration particles */
@@ -159,10 +159,10 @@
       <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none z-50">
         <div class="relative">
           <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-48 h-48 rounded-full bg-cyan-900/80 border-6 border-cyan-700 blur-sm"></div>
+            <div class="w-48 h-48 rounded-full bg-yellow-900/80 border-6 border-yellow-700 blur-sm"></div>
           </div>
-          <div class="relative bg-cyan-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-cyan-700 shadow-lg">
-            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200 transition-all duration-300">0</div>
+          <div class="relative bg-yellow-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-yellow-700 shadow-lg">
+            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-yellow-200 transition-all duration-300">0</div>
           </div>
         </div>
       </div>
