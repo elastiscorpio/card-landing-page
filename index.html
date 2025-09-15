@@ -24,7 +24,7 @@
 
     /* Fullscreen background video */
     #bg-video{
-      position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:3;
+      position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:4;
     }
 
     .card-container{perspective:1000px;transform-style:preserve-3d;}
@@ -116,7 +116,7 @@
 
         <!-- STACK: character video (clipped) + silver frame -->
         <div class="frame-stack">
-          <video autoplay muted loop playsinline class="character-video clip-window" style="z-index:2;">
+          <video autoplay muted loop playsinline class="character-video clip-window" style="z-index:4;">
             <source src="background.mp4" type="video/mp4">
           </video>
 
@@ -125,7 +125,7 @@
             src="./OG%20Base%20card%20special%20silver.png"
             alt="OG Base Card - Silver Frame"
             class="card-frame"
-            style="transform: scale(1.4) scaleY(1.1) translateY(1.3%); transform-origin: center; z-index:4;"
+            style="transform: scale(1.4) scaleY(1.1) translateY(1.3%); transform-origin: center; z-index:5;"
           />
         </div>
 
