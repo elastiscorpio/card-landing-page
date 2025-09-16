@@ -31,11 +31,32 @@
       cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
     }
 
-    .card-container{perspective:1000px;transform-style:preserve-3d;}
-    .card{
-      background:transparent;
-      box-shadow:0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
-      transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
+    .card-container {
+      perspective: 1000px;
+      width: 100%;
+      max-width: min(90vw, 600px);
+      aspect-ratio: 2/3;
+      margin: 0 auto;
+    }
+    .card {
+      background: transparent;
+      box-shadow: 0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
+      transform-style: preserve-3d;
+      will-change: transform;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      transition: transform 0.1s ease-out;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        transform: none !important;
+        transition: none !important;
+      }
     }
 
     .character-zone{position:relative;overflow:hidden;}
@@ -76,44 +97,47 @@
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === Frame + video stack (aligned) === */
-    .frame-stack { position:relative; width:100%; height:100%; }
-
-    /* Shared wrapper gets ALL transforms so frame and window stay aligned */
-    .art-fit{
-      position:absolute; inset:0;
-      transform: scale(1.4) scaleY(1.1) translateY(1.3%);
-      transform-origin:center;
-      will-change: transform;
+    /* Video container */
+    .video-container {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    /* Exact window area inside the frame */
-    .character-window{
-      position:absolute;
-      inset: var(--win-top) var(--win-right) var(--win-bottom) var(--win-left);
-      border-radius: var(--win-radius);
-      overflow:hidden;       /* clean rounded crop */
-      z-index:4;             /* under the frame (5) */
-    }
-    .character-window video{
-      width:100%;
-      height:100%;
-      object-fit:cover;      /* fills the window */
-      display:block;
+    /* Card frame */
+    .card-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 2;
+      pointer-events: none;
     }
 
-    .card-frame{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:contain; z-index:5; pointer-events:none;
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .card-container {
+        max-width: 95vw;
+      }
+    }
+    @media (max-width: 480px) {
+      .card-container {
+        aspect-ratio: 3/4;
+      }
     }
   </style>
 </head>
-<body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
+<body class="h-screen w-screen flex items-center justify-center p-4 bg-black">
 
   <div id="cursor-trails"></div>
 
-  <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
+  <div class="card-container">
     <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
       <div class="glow-effect"></div>
 
@@ -123,23 +147,20 @@
         <!-- background tint (subtle, stays behind) -->
         <div class="absolute inset-0 bg-black/60"></div>
 
-        <!-- STACK: fitted character video inside frame window + silver frame -->
-        <div class="frame-stack">
-          <div class="art-fit">
-            <div class="character-window">
-              <video autoplay muted loop playsinline preload="auto">
-                <source src="background.mp4" type="video/mp4">
-              </video>
-            </div>
-
-            <!-- Silver frame PNG with transparent center -->
-            <img
-              src="./OG%20Base%20card%20special%20silver.png"
-              alt="OG Base Card - Silver Frame"
-              class="card-frame"
-            />
-          </div>
+        <!-- Video background -->
+        <div class="video-container" aria-hidden="true">
+          <video autoplay muted loop playsinline preload="auto">
+            <source src="background.mp4" type="video/mp4">
+          </video>
         </div>
+
+        <!-- Card frame overlay -->
+        <img
+          src="./OG%20Base%20card%20special%20silver.png"
+          alt=""
+          class="card-frame"
+          loading="lazy"
+        />
 
         <div class="character-overlay"></div>
 
@@ -221,10 +242,22 @@
     });
 
     // Mouse parallax + trail
-    document.addEventListener('mousemove',e=>{
-      const xAxis=(window.innerWidth/2 - e.pageX)/25;
-      const yAxis=(window.innerHeight/2 - e.pageY)/25;
-      card.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+    let lastTime = 0;
+    const throttleRate = 16; // ~60fps
+    
+    function handleMouseMove(e) {
+      const now = Date.now();
+      if (now - lastTime < throttleRate) return;
+      lastTime = now;
+      
+      requestAnimationFrame(() => {
+        const xAxis = (window.innerWidth/2 - e.pageX)/25;
+        const yAxis = (window.innerHeight/2 - e.pageY)/25;
+        card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+      });
+    }
+    
+    document.addEventListener('mousemove', handleMouseMove);
 
       const trail=document.createElement('div');
       trail.className='cursor-trail';
