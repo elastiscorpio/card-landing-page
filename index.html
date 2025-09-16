@@ -6,10 +6,6 @@
   <title>Living Card - Lord of the Eternal Host</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
@@ -33,21 +29,28 @@
 
     .card-container{
       perspective:1000px;
-      transform-style:preserve-3d;
       width: clamp(300px, 90vw, 600px);
-      height: clamp(450px, 90vh, 800px);
+      aspect-ratio: 2/3;
       margin: auto;
     }
     .card{
       background:transparent;
-      box-shadow:0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
+      box-shadow:0 0 30px rgba(255,215,0,.5);
       transform-style:preserve-3d;
+      will-change: transform;
       transition:transform .1s;
       position:relative;
       overflow:hidden;
       width: 100%;
       height: 100%;
       aspect-ratio: 2/3;
+      backface-visibility: hidden;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        transform: none !important;
+      }
     }
 
     .character-zone{position:relative;overflow:hidden;}
@@ -59,8 +62,8 @@
 
     .glow-effect{
       position:absolute;width:100%;height:100%;
-      background:radial-gradient(circle at center, rgba(255,215,0,.6) 0%, transparent 70%);
-      animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
+      background:radial-gradient(circle at center, rgba(255,215,0,.3) 0%, transparent 70%);
+      pointer-events:none;filter:blur(5px);
     }
 
     .name-banner{font-family:'Cinzel Decorative',cursive;text-shadow:0 0 15px rgba(0,255,255,.9);letter-spacing:2px;}
@@ -88,31 +91,6 @@
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === Frame + video stack (aligned) === */
-    .frame-stack { position:relative; width:100%; height:100%; }
-
-    /* Responsive art fitting */
-    .art-fit{
-      position:absolute;
-      inset:0;
-      transform: scale(1.2) translateY(1%);
-      transform-origin:center;
-      will-change: transform;
-    }
-
-    @media (max-width: 768px) {
-      .art-fit {
-        transform: scale(1.1) translateY(1%);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .art-fit {
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    /* Responsive window area */
     .character-window{
       position:absolute;
       inset: 15% 10% 25% 10%;
@@ -120,29 +98,20 @@
       overflow:hidden;
       z-index:4;
     }
-
-    @media (max-width: 768px) {
-      .character-window {
-        inset: 18% 12% 28% 12%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .character-window {
-        inset: 20% 15% 30% 15%;
-      }
-    }
     .character-window video{
       width:100%;
       height:100%;
-      object-fit:cover;      /* fills the window */
+      object-fit:cover;
       display:block;
     }
-
     .card-frame{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:contain; z-index:5; pointer-events:none;
+      position:absolute; 
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:contain; 
+      z-index:5; 
+      pointer-events:none;
     }
   </style>
 </head>
@@ -207,16 +176,7 @@
     </div>
   </div>
 
-  <!-- Audio Element -->
-  <audio id="ambient-sound" loop>
-    <source src="https://www.soundjay.com/misc/sounds/wind-chime-01.mp3" type="audio/mpeg">
-  </audio>
-
   <script>
-    // Initialize libraries
-    AOS.init();
-    feather.replace();
-
     // Scoreboard empty state
     const scoresContainer = document.getElementById('scores-container');
     const emptyScore = document.createElement('div');
@@ -224,189 +184,38 @@
     emptyScore.textContent = '---';
     scoresContainer.appendChild(emptyScore);
 
-    // Reset scale and scores on double tap
-    document.addEventListener('dblclick', () => {
-      document.querySelectorAll('.score').forEach(s=>{
-        s.textContent='---'; s.classList.add('text-gray-500'); s.classList.remove('text-white');
-      });
-      scale = 1;
-      card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,'scale(1)');
-    });
-
-    // Device motion & touch handling
-    let scale = 1;
-    let initialDistance = null;
+    // Mouse parallax effect
     const card = document.getElementById('card');
+    let lastTime = 0;
+    
+    const handleMove = (e) => {
+      const now = performance.now();
+      if (now - lastTime < 16) return; // ~60fps
+      lastTime = now;
+      
+      const xAxis = (window.innerWidth/2 - e.clientX)/25;
+      const yAxis = (window.innerHeight/2 - e.clientY)/25;
+      card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+    };
 
-    // Touch rotate
-    let touchStartX=0,touchStartY=0,currentX=0,currentY=0,isDragging=false;
-    document.addEventListener('touchstart',e=>{
-      if(e.touches.length===1){isDragging=true;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;}
+    // Throttled event listeners
+    document.addEventListener('mousemove', (e) => {
+      requestAnimationFrame(() => handleMove(e));
     });
-    document.addEventListener('touchmove',e=>{
-      if(isDragging&&e.touches.length===1){
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1) {
         e.preventDefault();
-        const tx=e.touches[0].clientX, ty=e.touches[0].clientY;
-        currentX=(tx-touchStartX)/10; currentY=(ty-touchStartY)/10;
-        card.style.transform=`rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
+        requestAnimationFrame(() => handleMove(e.touches[0]));
       }
-    },{passive:false});
-    document.addEventListener('touchend',()=>{
-      isDragging=false;
-      gsap.to(card,{rotateY:0,rotateX:0,duration:.5,ease:"elastic.out(1,0.3)"});
-      currentX=0; currentY=0;
-    });
+    }, { passive: false });
 
-    // Mouse parallax + trail
-    document.addEventListener('mousemove',e=>{
-      const xAxis=(window.innerWidth/2 - e.pageX)/25;
-      const yAxis=(window.innerHeight/2 - e.pageY)/25;
-      card.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
-
-      const trail=document.createElement('div');
-      trail.className='cursor-trail';
-      trail.style.left=`${e.pageX}px`; trail.style.top=`${e.pageY}px`;
-      document.getElementById('cursor-trails').appendChild(trail);
-      setTimeout(()=>{trail.style.opacity='0';trail.style.transform='translate(-50%,-50%) scale(2)';setTimeout(()=>trail.remove(),300);},500);
-    });
-
-    // Pinch zoom
-    document.addEventListener('touchstart',e=>{
-      if(e.touches.length===2){
-        initialDistance=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
-        );
-      }
-    });
-    document.addEventListener('touchmove',e=>{
-      if(e.touches.length===2){
-        const d=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
-        );
-        if(initialDistance){
-          const newScale = Math.min(Math.max(scale * (d/initialDistance), .5), 3);
-          scale=newScale;
-          card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,`scale(${scale})`);
-        }
-        initialDistance=d;
-      }
-    });
-    document.addEventListener('touchend',()=>{initialDistance=null;});
-
-    // Hover effect
-    const characterZone=document.querySelector('.character-zone');
-    characterZone.addEventListener('mouseenter',()=>{
-      gsap.to('.character-overlay',{opacity:.5,duration:.5});
-      gsap.to('.glow-effect',{opacity:.8,duration:.5});
-    });
-    characterZone.addEventListener('mouseleave',()=>{
-      gsap.to('.character-overlay',{opacity:.3,duration:.5});
-      gsap.to('.glow-effect',{opacity:.3,duration:.5});
-    });
-
-    // Ambient sound
-    const ambientSound=document.getElementById('ambient-sound');
-    ambientSound.volume=.3;
-    const startAudio=()=>ambientSound.play();
-    document.addEventListener('click',startAudio,{once:true});
-    document.addEventListener('touchstart',startAudio,{once:true});
-
-    // Tap Counter Game
-    const tapGameContainer=document.getElementById('tap-game-container');
-    const tapCount=document.getElementById('tap-count');
-    const finalScore=document.getElementById('final-score');
-    const instruction=document.getElementById('counter-instruction');
-    let tapCounter=0, timeoutId=null, isCounting=false;
-
-    document.addEventListener('click',()=>{
-      if(!isCounting){
-        isCounting=true; tapCounter=1;
-        tapGameContainer.classList.remove('hidden');
-        tapCount.textContent=tapCounter; tapCount.classList.remove('hidden');
-        instruction?.classList.add('hidden'); finalScore?.classList.add('hidden');
-        gsap.to('.glow-effect',{opacity:.8,duration:.2});
-        setTimeout(()=>gsap.to('.glow-effect',{opacity:.3,duration:.5}),200);
-        const a=new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3'); a.volume=.2; a.play();
-      }else{
-        tapCounter++; tapCount.textContent=tapCounter;
-        if(tapCounter % 5 === 0){
-          gsap.to('#card',{rotateZ:Math.random()*10-5,duration:.2,yoyo:true,repeat:1});
-        }
-      }
-
-      clearTimeout(timeoutId);
-      timeoutId=setTimeout(()=>{
-        isCounting=false;
-        tapCount.textContent=tapCounter;
-        tapCount.classList.add('text-6xl');
-
-        const colors=['#ff0000','#ff9900','#ffff00','#00ff00','#0099ff','#9900ff'];
-        for(let i=0;i<30;i++){
-          setTimeout(()=>{
-            const fw=document.createElement('div');
-            fw.className='absolute rounded-full w-2 h-2';
-            const c=colors[Math.floor(Math.random()*colors.length)];
-            fw.style.background=c; fw.style.left=`${Math.random()*100}%`; fw.style.top=`${Math.random()*100}%`;
-            fw.style.boxShadow=`0 0 10px 2px ${c}`;
-            document.getElementById('card').appendChild(fw);
-            gsap.to(fw,{x:(Math.random()-.5)*200,y:(Math.random()-.5)*200,scale:5,opacity:0,duration:1,onComplete:()=>fw.remove()});
-          },i*50);
-        }
-
-        // Celebration effects
-        const a2 = new Audio('https://www.soundjay.com/misc/sounds/sci-fi-sound-effect-01.mp3'); 
-        a2.volume = 0.7;
-        a2.play();
-
-        // Create celebration particles
-        for(let i=0;i<100;i++){
-          setTimeout(()=>{
-            const particle = document.createElement('div');
-            particle.className = 'absolute rounded-full w-3 h-3 z-50';
-            const colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00'];
-            const color = colors[Math.floor(Math.random()*colors.length)];
-            particle.style.background = color;
-            particle.style.left = `${Math.random()*100}%`;
-            particle.style.top = `${Math.random()*100}%`;
-            particle.style.boxShadow = `0 0 15px 5px ${color}`;
-            document.getElementById('card').appendChild(particle);
-            
-            gsap.to(particle, {
-              x: (Math.random()-.5)*300,
-              y: (Math.random()-.5)*300,
-              scale: Math.random()*5 + 2,
-              opacity: 0,
-              duration: 2,
-              ease: "power2.out",
-              onComplete: () => particle.remove()
-            });
-          }, i*20);
-        }
-
-        // Glow pulse effect
-        gsap.to('.glow-effect', {
-          opacity: 0.9,
-          duration: 0.3,
-          yoyo: true,
-          repeat: 3,
-          ease: "sine.inOut"
-        });
-
-        setTimeout(()=>{
-          tapCount.classList.remove('text-6xl');
-          tapGameContainer.classList.add('hidden');
-
-          const scoreEls = scoresContainer.querySelectorAll('.score');
-          const newScore=document.createElement('div');
-          newScore.className='score text-white text-sm'; newScore.textContent=tapCounter;
-          if(scoreEls.length>0){scoreEls[0].remove();}
-          scoresContainer.appendChild(newScore);
-          document.getElementById('scoreboard').classList.remove('hidden');
-        },1500);
-      },1000);
-    });
+    // Reset position when interaction ends
+    const resetPosition = () => {
+      card.style.transform = 'rotateY(0) rotateX(0)';
+    };
+    document.addEventListener('mouseleave', resetPosition);
+    document.addEventListener('touchend', resetPosition);
   </script>
 </body>
 </html>
