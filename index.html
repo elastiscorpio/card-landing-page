@@ -14,6 +14,15 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
 
+    :root{
+      /* Tweak these if your PNG window is a hair off */
+      --win-top: 25%;
+      --win-right: 15%;
+      --win-bottom: 45%;
+      --win-left: 15%;
+      --win-radius: 18px;
+    }
+
     body{
       font-family:'MedievalSharp',cursive;
       --font-gothic:'UnifrakturMaguntia',cursive;
@@ -22,16 +31,23 @@
       cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
     }
 
-    /* Fullscreen background video */
-    #bg-video{
-      position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;
+    .card-container{
+      perspective:1000px;
+      transform-style:preserve-3d;
+      width: clamp(300px, 90vw, 600px);
+      height: clamp(450px, 90vh, 800px);
+      margin: auto;
     }
-
-    .card-container{perspective:1000px;transform-style:preserve-3d;}
     .card{
       background:transparent;
-      box-shadow:0 0 70px rgba(0,255,255,.7), inset 0 0 40px rgba(0,200,255,.6);
-      transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
+      box-shadow:0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
+      transform-style:preserve-3d;
+      transition:transform .1s;
+      position:relative;
+      overflow:hidden;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 2/3;
     }
 
     .character-zone{position:relative;overflow:hidden;}
@@ -43,17 +59,17 @@
 
     .glow-effect{
       position:absolute;width:100%;height:100%;
-      background:radial-gradient(circle at center, rgba(0,255,255,.5) 0%, transparent 70%);
+      background:radial-gradient(circle at center, rgba(255,215,0,.6) 0%, transparent 70%);
       animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
     }
 
     .name-banner{font-family:'Cinzel Decorative',cursive;text-shadow:0 0 15px rgba(0,255,255,.9);letter-spacing:2px;}
     .lore-panel{background:url('http://static.photos/red/1200x630/42') center/cover;box-shadow:inset 0 0 20px rgba(0,0,0,.7);}
     .stat-icon{transition:all .3s ease;}
-    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #00ffff);}
+    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #ffd700);}
     .cursor-trail{
       position:absolute;width:20px;height:20px;border-radius:50%;
-      background:rgba(0,255,255,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
+      background:rgba(255,215,0,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
     }
     
     /* Celebration particles */
@@ -65,68 +81,101 @@
     }
     
     @keyframes particle-fall {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100px) scale(0.2);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(100px) scale(0.2); opacity: 0; }
     }
     @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === NEW: Frame + video stack === */
-    .frame-stack{position:relative;width:100%;height:100%;}
-    .character-video{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;
+    /* === Frame + video stack (aligned) === */
+    .frame-stack { position:relative; width:100%; height:100%; }
+
+    /* Responsive art fitting */
+    .art-fit{
+      position:absolute;
+      inset:0;
+      transform: scale(1.2) translateY(1%);
+      transform-origin:center;
+      will-change: transform;
     }
-    /* Clip the video so it only shows inside the hollow window of the frame.
-       Tweak values (top right bottom left) to your liking. */
-    .character-video.clip-window{
-      clip-path: inset(25% 15% 45% 15% round 18px);
-      transform: scale(1.4);
-      transform-origin: center;
+
+    @media (max-width: 768px) {
+      .art-fit {
+        transform: scale(1.1) translateY(1%);
+      }
     }
+
+    @media (max-width: 480px) {
+      .art-fit {
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Responsive window area */
+    .character-window{
+      position:absolute;
+      inset: 15% 10% 25% 10%;
+      border-radius: 18px;
+      overflow:hidden;
+      z-index:4;
+    }
+
+    @media (max-width: 768px) {
+      .character-window {
+        inset: 18% 12% 28% 12%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .character-window {
+        inset: 20% 15% 30% 15%;
+      }
+    }
+    .character-window video{
+      width:100%;
+      height:100%;
+      object-fit:cover;      /* fills the window */
+      display:block;
+    }
+
     .card-frame{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;pointer-events:none;
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:contain; z-index:5; pointer-events:none;
     }
   </style>
 </head>
-<body class="h-screen w-screen flex items-start justify-center pt-[10%] p-4">
-
-  <!-- Fullscreen Background Video -->
-  <video autoplay muted loop playsinline preload id="bg-video">
-    <source src="background.mp4" type="video/mp4">
-  </video>
+<body class="h-screen w-screen flex items-center justify-center p-4">
 
   <div id="cursor-trails"></div>
 
-  <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
-    <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
+  <div class="card-container">
+    <div id="card" class="card rounded-lg flex flex-col relative">
       <div class="glow-effect"></div>
 
       <!-- Character Zone -->
       <div class="character-zone flex-1 relative overflow-hidden" style="height:100%;">
 
-        <!-- background tint (subtle) -->
+        <!-- background tint (subtle, stays behind) -->
         <div class="absolute inset-0 bg-black/60"></div>
 
-        <!-- STACK: character video (clipped) + silver frame -->
+        <!-- STACK: fitted character video inside frame window + silver frame -->
         <div class="frame-stack">
-          <video autoplay muted loop playsinline class="character-video clip-window">
-            <source src="background.mp4" type="video/mp4">
-          </video>
+          <div class="art-fit">
+            <div class="character-window">
+              <video autoplay muted loop playsinline preload="auto">
+                <source src="background.mp4" type="video/mp4">
+              </video>
+            </div>
 
-          <!-- Your silver frame PNG with transparent center -->
-          <img
-            src="./OG%20Base%20card%20special%20silver.png"
-            alt="OG Base Card - Silver Frame"
-            class="card-frame"
-            style="transform: scale(1.4) scaleY(1.1) translateY(1.3%); transform-origin: center;"
-          />
+            <!-- Silver frame PNG with transparent center -->
+            <img
+              src="./OG%20Base%20card%20special%20silver.png"
+              alt="OG Base Card - Silver Frame"
+              class="card-frame"
+            />
+          </div>
         </div>
 
         <div class="character-overlay"></div>
@@ -147,10 +196,10 @@
       <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none z-50">
         <div class="relative">
           <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-48 h-48 rounded-full bg-cyan-900/80 border-6 border-cyan-700 blur-sm"></div>
+            <div class="w-48 h-48 rounded-full bg-yellow-900/80 border-6 border-yellow-700 blur-sm"></div>
           </div>
-          <div class="relative bg-cyan-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-cyan-700 shadow-lg">
-            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-cyan-200 transition-all duration-300">0</div>
+          <div class="relative bg-yellow-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-yellow-700 shadow-lg">
+            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-yellow-200 transition-all duration-300">0</div>
           </div>
         </div>
       </div>
