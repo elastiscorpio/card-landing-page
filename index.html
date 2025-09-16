@@ -17,10 +17,10 @@
     /* ---------- Tune these 4 numbers so the video tucks exactly behind the silver frame window ---------- */
     :root{
       /* top, right, bottom, left insets as % of the card */
-      --win-top:    14%;
-      --win-right:  10%;
-      --win-bottom: 42%;
-      --win-left:   10%;
+      --win-top:    11.2%;
+      --win-right:  8%;
+      --win-bottom: 33.6%;
+      --win-left:   8%;
       --win-radius: 18px;   /* corner radius of the window opening */
     }
 
@@ -42,7 +42,7 @@
       background:transparent;
       box-shadow:0 0 70px rgba(0,255,255,.35), inset 0 0 40px rgba(0,200,255,.25);
       transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
-      width: min(100%, 640px);
+      width: min(100%, 800px);
       aspect-ratio: 2/3;  /* proper card ratio across devices */
     }
 
@@ -119,7 +119,7 @@
 
   <div id="cursor-trails"></div>
 
-  <div class="card-container w-full max-w-[680px]">
+  <div class="card-container w-full max-w-[850px]">
     <div id="card" class="card rounded-lg flex flex-col relative">
       <div class="glow-effect"></div>
 
