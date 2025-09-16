@@ -1,412 +1,248 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Living Card - Lord of the Eternal Host</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Living Card — Clean 3D</title>
 
+  <!-- Tailwind (kept) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <!-- Fonts (minimal) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400..900&family=MedievalSharp&display=swap" rel="stylesheet">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
-
     :root{
-      /* Tweak these if your PNG window is a hair off */
-      --win-top: 25%;
-      --win-right: 15%;
-      --win-bottom: 45%;
-      --win-left: 15%;
+      /* Adjust these to line up the transparent window with your PNG */
+      --win-top:   14%;
+      --win-right: 10%;
+      --win-bottom:26%;
+      --win-left:  10%;
       --win-radius: 18px;
+
+      --card-max: clamp(290px, 70vmin, 560px);
+      --bg: #000;
+      --text: #e8eaed;
+      --accent: #f3d86b;
+      --glow: rgba(255,215,0,.7);
+      --shadow: 0 14px 60px rgba(0,0,0,.55);
     }
 
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      font-family:'MedievalSharp',cursive;
-      --font-gothic:'UnifrakturMaguntia',cursive;
-      overflow:hidden;
-      background:#000;
-      cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
+      margin:0;
+      font-family: "MedievalSharp", ui-sans-serif, system-ui;
+      color: var(--text);
+      background: var(--bg);
+      overflow:hidden; /* keeps the stage clean */
     }
 
-    .card-container{
-      perspective:1000px;
-      transform-style:preserve-3d;
-      width: clamp(300px, 90vw, 600px);
-      height: clamp(450px, 90vh, 800px);
-      margin: auto;
-    }
-    .card{
-      background:transparent;
-      box-shadow:0 0 70px rgba(255,215,0,.8), inset 0 0 40px rgba(255,191,0,.7);
-      transform-style:preserve-3d;
-      transition:transform .1s;
+    /* ---------- Stage ---------- */
+    .stage{
       position:relative;
-      overflow:hidden;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 2/3;
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      isolation:isolate; /* clean stacking */
+      padding: 4vmin;
     }
 
-    .character-zone{position:relative;overflow:hidden;}
-
-    .character-overlay{
-      position:absolute;top:0;left:0;width:100%;height:100%;
-      mix-blend-mode:overlay;opacity:.3;pointer-events:none;
+    /* ---------- Card Container ---------- */
+    .card-wrap{
+      perspective: 1100px;
+      will-change: transform;
     }
 
-    .glow-effect{
-      position:absolute;width:100%;height:100%;
-      background:radial-gradient(circle at center, rgba(255,215,0,.6) 0%, transparent 70%);
-      animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
+    .card{
+      position:relative;
+      width: min(100%, var(--card-max));
+      aspect-ratio: 2 / 3;
+      border-radius: 18px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      box-shadow: var(--shadow);
+      background: transparent;
+      transition: transform 220ms ease, box-shadow 220ms ease;
     }
 
-    .name-banner{font-family:'Cinzel Decorative',cursive;text-shadow:0 0 15px rgba(0,255,255,.9);letter-spacing:2px;}
-    .lore-panel{background:url('http://static.photos/red/1200x630/42') center/cover;box-shadow:inset 0 0 20px rgba(0,0,0,.7);}
-    .stat-icon{transition:all .3s ease;}
-    .stat-icon:hover{transform:scale(1.2);filter:drop-shadow(0 0 12px #ffd700);}
-    .cursor-trail{
-      position:absolute;width:20px;height:20px;border-radius:50%;
-      background:rgba(255,215,0,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
+    /* soft aura glow rendered behind, doesn’t interfere with layout */
+    .card::before{
+      content:"";
+      position:absolute; inset:-10%;
+      border-radius: inherit;
+      background: radial-gradient(40% 40% at 25% 25%, var(--glow), transparent 70%),
+                  radial-gradient(55% 55% at 70% 60%, rgba(255,209,60,.35), transparent 75%);
+      filter: blur(24px);
+      z-index: 0;
+      pointer-events:none;
     }
-    
-    /* Celebration particles */
-    .celebration-particle {
-      position: absolute;
-      z-index: 9999;
-      filter: drop-shadow(0 0 10px currentColor);
-      animation: particle-fall 2s ease-out forwards;
-    }
-    
-    @keyframes particle-fall {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(100px) scale(0.2); opacity: 0; }
-    }
-    @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
-    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
-    .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === Frame + video stack (aligned) === */
-    .frame-stack { position:relative; width:100%; height:100%; }
+    /* ---------- Frame + Video stack ---------- */
+    .stack{ position:absolute; inset:0; z-index: 1; }
 
-    /* Responsive art fitting */
+    /* This wrapper keeps any transforms from shrinking the click area */
     .art-fit{
       position:absolute;
       inset:0;
-      transform: scale(1.2) translateY(1%);
       transform-origin:center;
       will-change: transform;
     }
 
-    @media (max-width: 768px) {
-      .art-fit {
-        transform: scale(1.1) translateY(1%);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .art-fit {
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    /* Responsive window area */
     .character-window{
       position:absolute;
-      inset: 15% 10% 25% 10%;
-      border-radius: 18px;
-      overflow:hidden;
-      z-index:4;
+      top: var(--win-top);
+      right: var(--win-right);
+      bottom: var(--win-bottom);
+      left: var(--win-left);
+      border-radius: var(--win-radius);
+      overflow: hidden;
+      z-index: 2; /* under the frame image (z=3) */
     }
 
-    @media (max-width: 768px) {
-      .character-window {
-        inset: 18% 12% 28% 12%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .character-window {
-        inset: 20% 15% 30% 15%;
-      }
-    }
     .character-window video{
-      width:100%;
-      height:100%;
-      object-fit:cover;      /* fills the window */
+      width:100%; height:100%;
       display:block;
+      object-fit: cover;
+      object-position: 50% 50%;
+      filter: saturate(.95) brightness(.95) contrast(1.05);
     }
 
     .card-frame{
       position:absolute; inset:0;
       width:100%; height:100%;
-      object-fit:contain; z-index:5; pointer-events:none;
+      display:block;
+      object-fit: contain;
+      z-index: 3; /* above the video */
+      pointer-events: none;
+    }
+
+    /* Subtle inner vignette to add depth, not a “blank shape” */
+    .inner-vignette{
+      position:absolute; inset:0; z-index: 4; pointer-events:none;
+      background:
+        radial-gradient(120% 120% at 50% -10%, transparent, rgba(0,0,0,.18) 70%),
+        radial-gradient(120% 120% at 50% 110%, transparent, rgba(0,0,0,.18) 70%);
+    }
+
+    /* ---------- Helper overlays (center glow) ---------- */
+    .center-glow{
+      position:absolute; inset:0; z-index: 1; pointer-events:none;
+      display:grid; place-items:center;
+    }
+    .center-glow > div{
+      width:70%; aspect-ratio:1/1; border-radius:50%;
+      background: radial-gradient(circle, rgba(255,215,0,.18), transparent 60%);
+      filter: blur(18px);
+    }
+
+    /* ---------- 3D tilt ---------- */
+    @media (hover:hover) and (pointer:fine){
+      .card:hover{ box-shadow: 0 26px 80px rgba(0,0,0,.55); }
+    }
+    /* Reduced motion: disable transforms */
+    @media (prefers-reduced-motion: reduce){
+      .card, .art-fit{ transition:none !important; transform:none !important; }
+    }
+
+    /* ---------- HUD (scoreboard) kept but tamed) ---------- */
+    .hud{
+      position:absolute; top:1rem; left:1rem; z-index:10;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+      border:1px solid rgba(255,255,255,.06);
+      padding:.6rem .75rem; border-radius:.75rem;
+    }
+
+    /* ---------- Small screens: window scales slightly larger to keep margins ---------- */
+    @media (max-width: 520px){
+      :root{
+        --win-top: 16%;
+        --win-right: 11%;
+        --win-bottom: 28%;
+        --win-left: 11%;
+      }
     }
   </style>
 </head>
-<body class="h-screen w-screen flex items-center justify-center p-4">
 
-  <div id="cursor-trails"></div>
+<body>
+  <main class="stage">
+    <!-- optional scoreboard; hidden by default -->
+    <div id="scoreboard" class="hud hidden">
+      <div class="text-[13px] text-[#9fe870] font-semibold">რეკორდი</div>
+      <div id="scores" class="text-sm opacity-80">—</div>
+    </div>
 
-  <div class="card-container">
-    <div id="card" class="card rounded-lg flex flex-col relative">
-      <div class="glow-effect"></div>
-
-      <!-- Character Zone -->
-      <div class="character-zone flex-1 relative overflow-hidden" style="height:100%;">
-
-        <!-- background tint (subtle, stays behind) -->
-        <div class="absolute inset-0 bg-black/60"></div>
-
-        <!-- STACK: fitted character video inside frame window + silver frame -->
-        <div class="frame-stack">
+    <!-- Card -->
+    <div class="card-wrap">
+      <article id="card" class="card">
+        <!-- media stack -->
+        <div class="stack">
           <div class="art-fit">
             <div class="character-window">
-              <video autoplay muted loop playsinline preload="auto">
-                <source src="background.mp4" type="video/mp4">
-              </video>
+              <video src="assets/background.mp4" autoplay muted loop playsinline preload="metadata"></video>
             </div>
-
-            <!-- Silver frame PNG with transparent center -->
-            <img
-              src="./OG%20Base%20card%20special%20silver.png"
-              alt="OG Base Card - Silver Frame"
-              class="card-frame"
-            />
+            <img src="assets/card-frame.png" alt="Card frame" class="card-frame" />
           </div>
+          <div class="inner-vignette"></div>
         </div>
 
-        <div class="character-overlay"></div>
-
-        <!-- Soft center glow -->
-        <div class="absolute inset-0 flex items-center justify-center">
-          <div class="w-3/4 h-3/4 bg-gradient-to-b from-transparent via-yellow-900/10 to-transparent rounded-full filter blur-xl opacity-30"></div>
-        </div>
-      </div>
-
-      <!-- Scoreboard -->
-      <div id="scoreboard" class="absolute top-4 left-4 bg-black/70 rounded-lg p-2 hidden" style="z-index: 9999;">
-        <div class="text-cyan-300 font-bold mb-1">რეკორდი</div>
-        <div id="scores-container" class="flex flex-col gap-1"></div>
-      </div>
-
-      <!-- Tap Counter Game -->
-      <div id="tap-game-container" class="absolute inset-0 flex items-start justify-center pt-[15%] hidden pointer-events-none z-50">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-48 h-48 rounded-full bg-yellow-900/80 border-6 border-yellow-700 blur-sm"></div>
-          </div>
-          <div class="relative bg-yellow-900/90 rounded-full w-48 h-48 flex items-center justify-center border-6 border-yellow-700 shadow-lg">
-            <div id="tap-count" class="text-5xl font-bold hidden font-gothic text-yellow-200 transition-all duration-300">0</div>
-          </div>
-        </div>
-      </div>
-
+        <!-- soft center glow -->
+        <div class="center-glow"><div></div></div>
+      </article>
     </div>
-  </div>
-
-  <!-- Audio Element -->
-  <audio id="ambient-sound" loop>
-    <source src="https://www.soundjay.com/misc/sounds/wind-chime-01.mp3" type="audio/mpeg">
-  </audio>
+  </main>
 
   <script>
-    // Initialize libraries
-    AOS.init();
-    feather.replace();
-
-    // Scoreboard empty state
-    const scoresContainer = document.getElementById('scores-container');
-    const emptyScore = document.createElement('div');
-    emptyScore.className = 'score text-gray-500 text-sm';
-    emptyScore.textContent = '---';
-    scoresContainer.appendChild(emptyScore);
-
-    // Reset scale and scores on double tap
-    document.addEventListener('dblclick', () => {
-      document.querySelectorAll('.score').forEach(s=>{
-        s.textContent='---'; s.classList.add('text-gray-500'); s.classList.remove('text-white');
-      });
-      scale = 1;
-      card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,'scale(1)');
-    });
-
-    // Device motion & touch handling
-    let scale = 1;
-    let initialDistance = null;
+    /* -------- Lightweight tilt with rAF (no jank), plus touch drag -------- */
     const card = document.getElementById('card');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Touch rotate
-    let touchStartX=0,touchStartY=0,currentX=0,currentY=0,isDragging=false;
-    document.addEventListener('touchstart',e=>{
-      if(e.touches.length===1){isDragging=true;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;}
-    });
-    document.addEventListener('touchmove',e=>{
-      if(isDragging&&e.touches.length===1){
-        e.preventDefault();
-        const tx=e.touches[0].clientX, ty=e.touches[0].clientY;
-        currentX=(tx-touchStartX)/10; currentY=(ty-touchStartY)/10;
-        card.style.transform=`rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
-      }
-    },{passive:false});
-    document.addEventListener('touchend',()=>{
-      isDragging=false;
-      gsap.to(card,{rotateY:0,rotateX:0,duration:.5,ease:"elastic.out(1,0.3)"});
-      currentX=0; currentY=0;
-    });
+    let targetRX = 0, targetRY = 0, rx = 0, ry = 0;
+    const maxTilt = 10; // degrees
 
-    // Mouse parallax + trail
-    document.addEventListener('mousemove',e=>{
-      const xAxis=(window.innerWidth/2 - e.pageX)/25;
-      const yAxis=(window.innerHeight/2 - e.pageY)/25;
-      card.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+    function animate(){
+      rx += (targetRX - rx) * 0.12;
+      ry += (targetRY - ry) * 0.12;
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      requestAnimationFrame(animate);
+    }
+    if(!reduce){ animate(); }
 
-      const trail=document.createElement('div');
-      trail.className='cursor-trail';
-      trail.style.left=`${e.pageX}px`; trail.style.top=`${e.pageY}px`;
-      document.getElementById('cursor-trails').appendChild(trail);
-      setTimeout(()=>{trail.style.opacity='0';trail.style.transform='translate(-50%,-50%) scale(2)';setTimeout(()=>trail.remove(),300);},500);
-    });
+    function setTiltFromPoint(x, y){
+      const rect = card.getBoundingClientRect();
+      const px = ((x - rect.left) / rect.width) - 0.5;
+      const py = ((y - rect.top) / rect.height) - 0.5;
+      targetRX = (-py * maxTilt);
+      targetRY = ( px * maxTilt);
+    }
 
-    // Pinch zoom
-    document.addEventListener('touchstart',e=>{
-      if(e.touches.length===2){
-        initialDistance=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
-        );
-      }
-    });
-    document.addEventListener('touchmove',e=>{
-      if(e.touches.length===2){
-        const d=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
-        );
-        if(initialDistance){
-          const newScale = Math.min(Math.max(scale * (d/initialDistance), .5), 3);
-          scale=newScale;
-          card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,`scale(${scale})`);
-        }
-        initialDistance=d;
-      }
-    });
-    document.addEventListener('touchend',()=>{initialDistance=null;});
+    // Mouse
+    if(!reduce && matchMedia('(hover:hover)').matches){
+      card.addEventListener('mousemove', e => setTiltFromPoint(e.clientX, e.clientY), {passive:true});
+      card.addEventListener('mouseleave', () => { targetRX = 0; targetRY = 0; }, {passive:true});
+    }
 
-    // Hover effect
-    const characterZone=document.querySelector('.character-zone');
-    characterZone.addEventListener('mouseenter',()=>{
-      gsap.to('.character-overlay',{opacity:.5,duration:.5});
-      gsap.to('.glow-effect',{opacity:.8,duration:.5});
-    });
-    characterZone.addEventListener('mouseleave',()=>{
-      gsap.to('.character-overlay',{opacity:.3,duration:.5});
-      gsap.to('.glow-effect',{opacity:.3,duration:.5});
-    });
+    // Touch drag (simple)
+    let dragging = false;
+    card.addEventListener('touchstart', e => { dragging = true; }, {passive:true});
+    card.addEventListener('touchmove', e => {
+      if(!dragging || reduce) return;
+      const t = e.touches[0];
+      setTiltFromPoint(t.clientX, t.clientY);
+    }, {passive:true});
+    card.addEventListener('touchend', () => { dragging = false; targetRX = 0; targetRY = 0; }, {passive:true});
 
-    // Ambient sound
-    const ambientSound=document.getElementById('ambient-sound');
-    ambientSound.volume=.3;
-    const startAudio=()=>ambientSound.play();
-    document.addEventListener('click',startAudio,{once:true});
-    document.addEventListener('touchstart',startAudio,{once:true});
-
-    // Tap Counter Game
-    const tapGameContainer=document.getElementById('tap-game-container');
-    const tapCount=document.getElementById('tap-count');
-    const finalScore=document.getElementById('final-score');
-    const instruction=document.getElementById('counter-instruction');
-    let tapCounter=0, timeoutId=null, isCounting=false;
-
-    document.addEventListener('click',()=>{
-      if(!isCounting){
-        isCounting=true; tapCounter=1;
-        tapGameContainer.classList.remove('hidden');
-        tapCount.textContent=tapCounter; tapCount.classList.remove('hidden');
-        instruction?.classList.add('hidden'); finalScore?.classList.add('hidden');
-        gsap.to('.glow-effect',{opacity:.8,duration:.2});
-        setTimeout(()=>gsap.to('.glow-effect',{opacity:.3,duration:.5}),200);
-        const a=new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3'); a.volume=.2; a.play();
-      }else{
-        tapCounter++; tapCount.textContent=tapCounter;
-        if(tapCounter % 5 === 0){
-          gsap.to('#card',{rotateZ:Math.random()*10-5,duration:.2,yoyo:true,repeat:1});
-        }
-      }
-
-      clearTimeout(timeoutId);
-      timeoutId=setTimeout(()=>{
-        isCounting=false;
-        tapCount.textContent=tapCounter;
-        tapCount.classList.add('text-6xl');
-
-        const colors=['#ff0000','#ff9900','#ffff00','#00ff00','#0099ff','#9900ff'];
-        for(let i=0;i<30;i++){
-          setTimeout(()=>{
-            const fw=document.createElement('div');
-            fw.className='absolute rounded-full w-2 h-2';
-            const c=colors[Math.floor(Math.random()*colors.length)];
-            fw.style.background=c; fw.style.left=`${Math.random()*100}%`; fw.style.top=`${Math.random()*100}%`;
-            fw.style.boxShadow=`0 0 10px 2px ${c}`;
-            document.getElementById('card').appendChild(fw);
-            gsap.to(fw,{x:(Math.random()-.5)*200,y:(Math.random()-.5)*200,scale:5,opacity:0,duration:1,onComplete:()=>fw.remove()});
-          },i*50);
-        }
-
-        // Celebration effects
-        const a2 = new Audio('https://www.soundjay.com/misc/sounds/sci-fi-sound-effect-01.mp3'); 
-        a2.volume = 0.7;
-        a2.play();
-
-        // Create celebration particles
-        for(let i=0;i<100;i++){
-          setTimeout(()=>{
-            const particle = document.createElement('div');
-            particle.className = 'absolute rounded-full w-3 h-3 z-50';
-            const colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00'];
-            const color = colors[Math.floor(Math.random()*colors.length)];
-            particle.style.background = color;
-            particle.style.left = `${Math.random()*100}%`;
-            particle.style.top = `${Math.random()*100}%`;
-            particle.style.boxShadow = `0 0 15px 5px ${color}`;
-            document.getElementById('card').appendChild(particle);
-            
-            gsap.to(particle, {
-              x: (Math.random()-.5)*300,
-              y: (Math.random()-.5)*300,
-              scale: Math.random()*5 + 2,
-              opacity: 0,
-              duration: 2,
-              ease: "power2.out",
-              onComplete: () => particle.remove()
-            });
-          }, i*20);
-        }
-
-        // Glow pulse effect
-        gsap.to('.glow-effect', {
-          opacity: 0.9,
-          duration: 0.3,
-          yoyo: true,
-          repeat: 3,
-          ease: "sine.inOut"
-        });
-
-        setTimeout(()=>{
-          tapCount.classList.remove('text-6xl');
-          tapGameContainer.classList.add('hidden');
-
-          const scoreEls = scoresContainer.querySelectorAll('.score');
-          const newScore=document.createElement('div');
-          newScore.className='score text-white text-sm'; newScore.textContent=tapCounter;
-          if(scoreEls.length>0){scoreEls[0].remove();}
-          scoresContainer.appendChild(newScore);
-          document.getElementById('scoreboard').classList.remove('hidden');
-        },1500);
-      },1000);
-    });
+    /* -------- Minimal scoreboard hook (kept functional) -------- */
+    const scores = document.getElementById('scores');
+    let taps = 0, timer;
+    document.addEventListener('click', () => {
+      clearTimeout(timer);
+      taps++;
+      scores.textContent = String(taps);
+      document.getElementById('scoreboard').classList.remove('hidden');
+      timer = setTimeout(()=>{ taps = 0; }, 1200);
+    }, {passive:true});
   </script>
 </body>
 </html>
