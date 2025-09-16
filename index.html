@@ -34,9 +34,10 @@
     .card-container {
       perspective: 1000px;
       width: 100%;
-      max-width: min(90vw, 600px);
+      max-width: min(90vw, 400px);
       aspect-ratio: 2/3;
       margin: 0 auto;
+      touch-action: none;
     }
     .card {
       background: transparent;
@@ -50,6 +51,8 @@
       transition: transform 0.1s ease-out;
       border-radius: 16px;
       overflow: hidden;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -124,11 +127,17 @@
     @media (max-width: 768px) {
       .card-container {
         max-width: 95vw;
+        perspective: 800px;
+      }
+      .card {
+        transition: transform 0.05s ease-out;
       }
     }
     @media (max-width: 480px) {
       .card-container {
+        max-width: 90vw;
         aspect-ratio: 3/4;
+        perspective: 600px;
       }
     }
   </style>
@@ -241,55 +250,110 @@
       currentX=0; currentY=0;
     });
 
-    // Mouse parallax + trail
+    // Mobile & desktop interaction
     let lastTime = 0;
     const throttleRate = 16; // ~60fps
-    
-    function handleMouseMove(e) {
+    let isDragging = false;
+    let startX, startY, currentX = 0, currentY = 0;
+
+    function handleMove(x, y) {
       const now = Date.now();
       if (now - lastTime < throttleRate) return;
       lastTime = now;
       
       requestAnimationFrame(() => {
-        const xAxis = (window.innerWidth/2 - e.pageX)/25;
-        const yAxis = (window.innerHeight/2 - e.pageY)/25;
-        card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(${scale})`;
+        const xAxis = currentX + (window.innerWidth/2 - x)/25;
+        const yAxis = currentY + (window.innerHeight/2 - y)/25;
+        card.style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg) scale(${scale})`;
       });
     }
-    
-    document.addEventListener('mousemove', handleMouseMove);
 
-      const trail=document.createElement('div');
-      trail.className='cursor-trail';
-      trail.style.left=`${e.pageX}px`; trail.style.top=`${e.pageY}px`;
-      document.getElementById('cursor-trails').appendChild(trail);
-      setTimeout(()=>{trail.style.opacity='0';trail.style.transform='translate(-50%,-50%) scale(2)';setTimeout(()=>trail.remove(),300);},500);
+    // Mouse events
+    document.addEventListener('mousemove', (e) => handleMove(e.pageX, e.pageY));
+    document.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.pageX;
+      startY = e.pageY;
+    });
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      currentX += (window.innerWidth/2 - startX)/25;
+      currentY += (window.innerHeight/2 - startY)/25;
+    });
+
+    // Touch events
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }
+    });
+
+    document.addEventListener('touchend', () => {
+      isDragging = false;
+      currentX += (window.innerWidth/2 - startX)/25;
+      currentY += (window.innerHeight/2 - startY)/25;
+      gsap.to(card, {
+        rotateY: currentX,
+        rotateX: -currentY,
+        duration: 0.5,
+        ease: "elastic.out(1,0.3)"
+      });
+    });
+
+    // Reset position on double tap/click
+    document.addEventListener('dblclick', () => {
+      currentX = 0;
+      currentY = 0;
+      gsap.to(card, {
+        rotateY: 0,
+        rotateX: 0,
+        duration: 0.5,
+        ease: "elastic.out(1,0.3)"
+      });
     });
 
     // Pinch zoom
-    document.addEventListener('touchstart',e=>{
-      if(e.touches.length===2){
-        initialDistance=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
+    document.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
         );
       }
     });
-    document.addEventListener('touchmove',e=>{
-      if(e.touches.length===2){
-        const d=Math.hypot(
-          e.touches[0].clientX-e.touches[1].clientX,
-          e.touches[0].clientY-e.touches[1].clientY
+
+    document.addEventListener('touchmove', e => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const d = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
         );
-        if(initialDistance){
-          const newScale = Math.min(Math.max(scale * (d/initialDistance), .5), 3);
-          scale=newScale;
-          card.style.transform = card.style.transform.replace(/scale\([^)]*\)/,`scale(${scale})`);
+        if (initialDistance) {
+          const newScale = Math.min(Math.max(scale * (d / initialDistance), 0.8), 2);
+          scale = newScale;
+          card.style.transform = `rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
         }
-        initialDistance=d;
+        initialDistance = d;
       }
+    }, { passive: false });
+
+    document.addEventListener('touchend', () => {
+      initialDistance = null;
+      // Snap to reasonable scale limits
+      if (scale < 1) scale = 1;
+      if (scale > 1.5) scale = 1.5;
+      card.style.transform = `rotateY(${currentX}deg) rotateX(${-currentY}deg) scale(${scale})`;
     });
-    document.addEventListener('touchend',()=>{initialDistance=null;});
 
     // Hover effect
     const characterZone=document.querySelector('.character-zone');
