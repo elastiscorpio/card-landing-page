@@ -14,6 +14,16 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative&family=UnifrakturMaguntia&display=swap');
 
+    /* ---------- Tune these 4 numbers so the video tucks exactly behind the silver frame window ---------- */
+    :root{
+      /* top, right, bottom, left insets as % of the card */
+      --win-top:    14%;
+      --win-right:  10%;
+      --win-bottom: 42%;
+      --win-left:   10%;
+      --win-radius: 18px;   /* corner radius of the window opening */
+    }
+
     body{
       font-family:'MedievalSharp',cursive;
       --font-gothic:'UnifrakturMaguntia',cursive;
@@ -22,7 +32,7 @@
       cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>"),auto;
     }
 
-    /* Fullscreen background video */
+    /* Fullscreen background video (kept) */
     #bg-video{
       position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;
     }
@@ -30,20 +40,22 @@
     .card-container{perspective:1000px;transform-style:preserve-3d;}
     .card{
       background:transparent;
-      box-shadow:0 0 70px rgba(0,255,255,.7), inset 0 0 40px rgba(0,200,255,.6);
+      box-shadow:0 0 70px rgba(0,255,255,.35), inset 0 0 40px rgba(0,200,255,.25);
       transform-style:preserve-3d;transition:transform .1s;position:relative;overflow:hidden;
+      width: min(100%, 640px);
+      aspect-ratio: 2/3;  /* proper card ratio across devices */
     }
 
     .character-zone{position:relative;overflow:hidden;}
 
     .character-overlay{
       position:absolute;top:0;left:0;width:100%;height:100%;
-      mix-blend-mode:overlay;opacity:.3;pointer-events:none;
+      mix-blend-mode:overlay;opacity:.25;pointer-events:none;
     }
 
     .glow-effect{
       position:absolute;width:100%;height:100%;
-      background:radial-gradient(circle at center, rgba(0,255,255,.5) 0%, transparent 70%);
+      background:radial-gradient(circle at center, rgba(0,255,255,.4) 0%, transparent 70%);
       animation:pulse 2s infinite alternate;pointer-events:none;filter:blur(10px);
     }
 
@@ -55,43 +67,46 @@
       position:absolute;width:20px;height:20px;border-radius:50%;
       background:rgba(0,255,255,.7);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;
     }
-    
-    /* Celebration particles */
-    .celebration-particle {
-      position: absolute;
-      z-index: 9999;
-      filter: drop-shadow(0 0 10px currentColor);
-      animation: particle-fall 2s ease-out forwards;
-    }
-    
-    @keyframes particle-fall {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100px) scale(0.2);
-        opacity: 0;
-      }
-    }
-    @keyframes pulse{0%{opacity:.3}100%{opacity:.7}}
+    @keyframes pulse{0%{opacity:.25}100%{opacity:.6}}
     @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
     .floating{animation:float 6s ease-in-out infinite;}
 
-    /* === NEW: Frame + video stack === */
+    /* ---------- Precise frame + video stack (no clip-path) ---------- */
     .frame-stack{position:relative;width:100%;height:100%;}
-    .character-video{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;
+    /* Wrap allows uniform scaling/position tweaks if you need them later */
+    .art-fit{position:absolute; inset:0; transform-origin:center; will-change:transform;}
+
+    /* This is the “hole” of the frame. Video is clipped by overflow+radius. */
+    .character-window{
+      position:absolute;
+      top: var(--win-top);
+      right: var(--win-right);
+      bottom: var(--win-bottom);
+      left: var(--win-left);
+      border-radius: var(--win-radius);
+      overflow:hidden;
+      z-index:4; /* under frame PNG */
     }
-    /* Clip the video so it only shows inside the hollow window of the frame.
-       Tweak values (top right bottom left) to your liking. */
-    .character-video.clip-window{
-      clip-path: inset(25% 15% 45% 15% round 18px);
-      transform: scale(1.4);
-      transform-origin: center;
+    .character-window video{
+      width:100%;height:100%;
+      object-fit:cover;object-position:50% 50%;
+      display:block;
     }
+
+    /* The silver frame image sits above, center-fitted, with transparent middle. */
     .card-frame{
-      position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:5;pointer-events:none;
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:contain;z-index:5;pointer-events:none;display:block;
+    }
+
+    /* Small screens: the art window grows a touch so borders still look even */
+    @media (max-width: 520px){
+      :root{
+        --win-top:    16%;
+        --win-right:  11%;
+        --win-bottom: 44%;
+        --win-left:   11%;
+      }
     }
   </style>
 </head>
@@ -104,36 +119,40 @@
 
   <div id="cursor-trails"></div>
 
-  <div class="card-container w-full h-full max-w-2xl max-h-[75vh]">
-    <div id="card" class="card w-full h-full rounded-lg flex flex-col relative">
+  <div class="card-container w-full max-w-[680px]">
+    <div id="card" class="card rounded-lg flex flex-col relative">
       <div class="glow-effect"></div>
 
       <!-- Character Zone -->
-      <div class="character-zone flex-1 relative overflow-hidden" style="height:100%;">
+      <div class="character-zone flex-1 relative overflow-hidden">
 
-        <!-- background tint (subtle) -->
+        <!-- subtle darkening so the frame pops -->
         <div class="absolute inset-0 bg-black/60"></div>
 
-        <!-- STACK: character video (clipped) + silver frame -->
+        <!-- STACK: true window + video (behind) and the silver frame (above) -->
         <div class="frame-stack">
-          <video autoplay muted loop playsinline class="character-video clip-window">
-            <source src="background.mp4" type="video/mp4">
-          </video>
+          <div class="art-fit">
+            <!-- *** This is the exact window area of the frame’s top square *** -->
+            <div class="character-window">
+              <video autoplay muted loop playsinline preload="metadata">
+                <source src="background.mp4" type="video/mp4">
+              </video>
+            </div>
 
-          <!-- Your silver frame PNG with transparent center -->
-          <img
-            src="./OG%20Base%20card%20special%20silver.png"
-            alt="OG Base Card - Silver Frame"
-            class="card-frame"
-            style="transform: scale(1.4) scaleY(1.1) translateY(1.3%); transform-origin: center;"
-          />
+            <!-- Silver frame PNG with transparent center -->
+            <img
+              src="./OG%20Base%20card%20special%20silver.png"
+              alt="OG Base Card - Silver Frame"
+              class="card-frame"
+            />
+          </div>
         </div>
 
         <div class="character-overlay"></div>
 
         <!-- Soft center glow -->
         <div class="absolute inset-0 flex items-center justify-center">
-          <div class="w-3/4 h-3/4 bg-gradient-to-b from-transparent via-yellow-900/10 to-transparent rounded-full filter blur-xl opacity-30"></div>
+          <div class="w-3/4 aspect-square bg-gradient-to-b from-transparent via-cyan-900/10 to-transparent rounded-full filter blur-xl opacity-30"></div>
         </div>
       </div>
 
@@ -249,11 +268,11 @@
     // Hover effect
     const characterZone=document.querySelector('.character-zone');
     characterZone.addEventListener('mouseenter',()=>{
-      gsap.to('.character-overlay',{opacity:.5,duration:.5});
+      gsap.to('.character-overlay',{opacity:.45,duration:.5});
       gsap.to('.glow-effect',{opacity:.8,duration:.5});
     });
     characterZone.addEventListener('mouseleave',()=>{
-      gsap.to('.character-overlay',{opacity:.3,duration:.5});
+      gsap.to('.character-overlay',{opacity:.25,duration:.5});
       gsap.to('.glow-effect',{opacity:.3,duration:.5});
     });
 
@@ -264,7 +283,7 @@
     document.addEventListener('click',startAudio,{once:true});
     document.addEventListener('touchstart',startAudio,{once:true});
 
-    // Tap Counter Game
+    // Tap Counter Game (unchanged)
     const tapGameContainer=document.getElementById('tap-game-container');
     const tapCount=document.getElementById('tap-count');
     const finalScore=document.getElementById('final-score');
@@ -306,12 +325,10 @@
           },i*50);
         }
 
-        // Celebration effects
         const a2 = new Audio('https://www.soundjay.com/misc/sounds/sci-fi-sound-effect-01.mp3'); 
         a2.volume = 0.7;
         a2.play();
 
-        // Create celebration particles
         for(let i=0;i<100;i++){
           setTimeout(()=>{
             const particle = document.createElement('div');
@@ -336,14 +353,7 @@
           }, i*20);
         }
 
-        // Glow pulse effect
-        gsap.to('.glow-effect', {
-          opacity: 0.9,
-          duration: 0.3,
-          yoyo: true,
-          repeat: 3,
-          ease: "sine.inOut"
-        });
+        gsap.to('.glow-effect', { opacity: 0.9, duration: 0.3, yoyo: true, repeat: 3, ease: "sine.inOut" });
 
         setTimeout(()=>{
           tapCount.classList.remove('text-6xl');
